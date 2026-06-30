@@ -191,7 +191,7 @@ const AdminDashboard = () => {
                 {pendingHostels.map((hostel) => (
                   <div key={hostel._id} className="flex flex-col gap-xs" style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '15px' }}>
                     <span className="font-bold text-sm">{hostel.name}</span>
-                    <p className="text-xs text-muted-color">📍 Address: {hostel.location?.address}</p>
+                    <p className="text-xs text-muted-color"> Address: {hostel.location?.address}</p>
                     <p className="text-xs">Gender restriction: <strong style={{ textTransform: 'capitalize' }}>{hostel.genderType}</strong></p>
                     <p className="text-xs text-muted-color">Submitted by owner: {hostel.owner?.name} ({hostel.owner?.email})</p>
                     
@@ -221,12 +221,12 @@ const AdminDashboard = () => {
                     <div className="docs-attachments flex flex-col gap-xs" style={{ margin: '8px 0' }}>
                       {owner.verificationDocs?.govtId && (
                         <a href={owner.verificationDocs.govtId} target="_blank" rel="noopener noreferrer" className="text-xs nav-link" style={{ color: 'var(--accent-color)' }}>
-                          📄 View Government ID Card
+                           View Government ID Card
                         </a>
                       )}
                       {owner.verificationDocs?.businessProof && (
                         <a href={owner.verificationDocs.businessProof} target="_blank" rel="noopener noreferrer" className="text-xs nav-link" style={{ color: 'var(--accent-color)' }}>
-                          📄 View Hostel Business License
+                           View Hostel Business License
                         </a>
                       )}
                     </div>
@@ -260,7 +260,7 @@ const AdminDashboard = () => {
                   <p className="text-sm" style={{ backgroundColor: 'var(--bg-color)', padding: '10px', borderRadius: '4px', margin: '5px 0' }}>"{rev.comment}"</p>
                   
                   <div className="report-alert flex items-center gap-sm" style={{ color: 'var(--error-color)', padding: '5px 0' }}>
-                    <span className="text-xs">⚠️ Flagged Reason:</span>
+                    <span className="text-xs"> Flagged Reason:</span>
                     <span className="text-xs font-semibold">{rev.reportReason || 'Fake Review'}</span>
                   </div>
 

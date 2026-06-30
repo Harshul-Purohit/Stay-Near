@@ -115,7 +115,7 @@ const HostelDetailsPage = () => {
             <span className={`badge badge-${hostel.genderType}`}>{hostel.genderType}</span>
             {hostel.isVerified && <span className="badge badge-verified">✓ Verified by StayNear</span>}
           </div>
-          <p className="text-muted-color" style={{ marginTop: '5px' }}>📍 {hostel.location?.address}</p>
+          <p className="text-muted-color" style={{ marginTop: '5px' }}> {hostel.location?.address}</p>
         </div>
         
         <div className="flex items-center gap-md">
@@ -165,7 +165,7 @@ const HostelDetailsPage = () => {
             </div>
           ) : (
             <div className="login-to-view text-center flex flex-col gap-sm" style={{ backgroundColor: '#fff8f8', padding: '15px', borderRadius: '8px' }}>
-              <span style={{ fontSize: '24px' }}>🔒</span>
+              <span style={{ fontSize: '24px' }}></span>
               <p className="text-xs text-muted-color">Student credentials required to view contact details.</p>
               <Link to="/login" className="btn btn-sm btn-primary">Log In to View</Link>
             </div>
@@ -178,7 +178,7 @@ const HostelDetailsPage = () => {
             className="btn btn-secondary flex justify-center"
             style={{ width: '100%' }}
           >
-            🗺️ View on Google Maps
+             View on Google Maps
           </a>
         </aside>
       </div>
@@ -220,7 +220,7 @@ const HostelDetailsPage = () => {
           onClick={() => setMenuOpen(!menuOpen)}
         >
           <div className="flex items-center gap-md">
-            <span style={{ fontSize: '24px' }}>🍳</span>
+            <span style={{ fontSize: '24px' }}></span>
             <div>
               <h3 className="font-bold text-base">Weekly Mess Food Menu</h3>
               <p className="text-xs text-muted-color">View breakfast, lunch, and dinner timetables</p>

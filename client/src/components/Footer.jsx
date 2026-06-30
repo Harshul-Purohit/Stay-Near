@@ -6,7 +6,7 @@ const Footer = () => {
     <footer className="footer">
       <div className="container footer-grid grid">
         <div className="footer-brand flex flex-col">
-          <h3 className="font-bold text-lg footer-title">🏡 StayNear</h3>
+          <h3 className="font-bold text-lg footer-title"> StayNear</h3>
           <p className="text-sm text-muted-color">
             Simplifying hostel and PG discovery for university students. 
             Direct comparison, verified listings, and student-powered reviews.
@@ -26,9 +26,9 @@ const Footer = () => {
 
         <div className="footer-contact flex flex-col">
           <h4 className="font-semibold text-sm footer-subtitle">Get in Touch</h4>
-          <p className="text-sm text-muted-color">📍 JECRC University Campus, Sitapura, Jaipur</p>
-          <p className="text-sm text-muted-color">📞 Support Helpline: +91 98765 43210</p>
-          <p className="text-sm text-muted-color">✉️ Email Support: help@staynear.in</p>
+          <p className="text-sm text-muted-color"> JECRC University Campus, Sitapura, Jaipur</p>
+          <p className="text-sm text-muted-color"> Support Helpline: +91 98765 43210</p>
+          <p className="text-sm text-muted-color"> Email Support: help@staynear.in</p>
         </div>
       </div>
       <div className="footer-bottom text-center text-xs text-muted-color">

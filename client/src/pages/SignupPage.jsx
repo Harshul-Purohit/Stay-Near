@@ -86,14 +86,14 @@ const SignupPage = () => {
             className={`btn ${role === 'student' ? 'btn-primary' : 'btn-secondary'} flex-1`}
             onClick={() => { setRole('student'); setError(''); }}
           >
-            🎓 Student
+             Student
           </button>
           <button
             type="button"
             className={`btn ${role === 'owner' ? 'btn-primary' : 'btn-secondary'} flex-1`}
             onClick={() => { setRole('owner'); setError(''); }}
           >
-            🏢 Hostel Owner
+             Hostel Owner
           </button>
         </div>
 

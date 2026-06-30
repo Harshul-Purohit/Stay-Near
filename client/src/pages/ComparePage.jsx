@@ -20,7 +20,7 @@ const ComparePage = () => {
   if (compareList.length === 0) {
     return (
       <div className="container text-center" style={{ padding: '80px 20px', minHeight: '60vh' }}>
-        <span style={{ fontSize: '48px' }}>📊</span>
+        <span style={{ fontSize: '48px' }}></span>
         <h2 style={{ marginTop: '20px' }}>Your Comparison List is Empty</h2>
         <p className="text-muted-color" style={{ margin: '10px 0 20px 0' }}>
           Add hostels directly from the Search Results page to compare them side-by-side.

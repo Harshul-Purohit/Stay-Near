@@ -93,7 +93,7 @@ const LandingPage = () => {
             {/* Quick Search Form */}
             <form onSubmit={handleSearchSubmit} className="hero-search-bar flex items-center card">
               <div className="search-input-group flex-1 flex items-center">
-                <span className="search-icon">🔍</span>
+                <span className="search-icon"></span>
                 <input
                   type="text"
                   placeholder="Search by PG name, location, landmarks..."
@@ -159,7 +159,7 @@ const LandingPage = () => {
 
           <div className="steps-grid grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: '40px', marginTop: '40px' }}>
             <div className="step-card card text-center flex flex-col items-center">
-              <div className="step-icon">🔍</div>
+              <div className="step-icon"></div>
               <h3 className="font-semibold text-lg step-title">1. Search & Filter</h3>
               <p className="text-sm text-muted-color">
                 Filter hostels near JECRC University by budget, gender requirements, room capacity, and required facilities like AC or gym.
@@ -167,7 +167,7 @@ const LandingPage = () => {
             </div>
 
             <div className="step-card card text-center flex flex-col items-center">
-              <div className="step-icon">📊</div>
+              <div className="step-icon"></div>
               <h3 className="font-semibold text-lg step-title">2. Side-by-Side Compare</h3>
               <p className="text-sm text-muted-color">
                 Add up to 3 listings to compare pricing models, distance from university, and check weekly food menus transparently.
@@ -175,7 +175,7 @@ const LandingPage = () => {
             </div>
 
             <div className="step-card card text-center flex flex-col items-center">
-              <div className="step-icon">💬</div>
+              <div className="step-icon"></div>
               <h3 className="font-semibold text-lg step-title">3. Contact & Review</h3>
               <p className="text-sm text-muted-color">
                 Directly view verified contact numbers to book a visit. Read review score histories and submit honest feedbacks of your own.

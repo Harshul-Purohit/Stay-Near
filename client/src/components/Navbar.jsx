@@ -24,7 +24,7 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="container navbar-container flex items-center justify-between">
         <Link to="/" className="navbar-logo flex items-center font-bold text-xl">
-          <span className="logo-icon">🏡</span> StayNear
+          <span className="logo-icon"></span> StayNear
         </Link>
 
         {/* Hamburger Icon for Mobile */}

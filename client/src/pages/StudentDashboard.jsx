@@ -128,7 +128,7 @@ const StudentDashboard = () => {
           <p className="text-sm text-muted-color">Manage your profile, reviews, and reports</p>
         </div>
         <button onClick={() => setReportModalOpen(true)} className="btn btn-secondary">
-          🚩 Report Fake Hostel Listing
+           Report Fake Hostel Listing
         </button>
       </div>
 
@@ -136,7 +136,7 @@ const StudentDashboard = () => {
         {/* Profile Card */}
         <aside className="profile-card card flex flex-col gap-md">
           <div className="profile-header text-center">
-            <span style={{ fontSize: '48px' }}>🎓</span>
+            <span style={{ fontSize: '48px' }}></span>
             <h3 className="font-bold text-lg" style={{ marginTop: '10px' }}>{user.name}</h3>
             <span className="badge badge-verified" style={{ fontSize: '11px', textTransform: 'capitalize' }}>
               {user.role} Status: Active

@@ -221,7 +221,7 @@ const SearchPage = () => {
           ) : (
             /* Empty State Container */
             <div className="empty-state card text-center flex flex-col items-center gap-md">
-              <span className="empty-icon" style={{ fontSize: '48px' }}>🔍</span>
+              <span className="empty-icon" style={{ fontSize: '48px' }}></span>
               <h3 className="font-bold text-lg">No Listings Found</h3>
               <p className="text-sm text-muted-color" style={{ maxWidth: '400px' }}>
                 We couldn't find any hostels matching your specific filters. Try loosening your budget or searching by area.

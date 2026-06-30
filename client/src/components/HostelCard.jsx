@@ -49,7 +49,7 @@ const HostelCard = ({ hostel }) => {
 
       <div className="hostel-card-details flex flex-col flex-1">
         <h3 className="hostel-card-title">{hostel.name}</h3>
-        <p className="hostel-card-address text-sm text-muted-color">📍 {hostel.location?.address}</p>
+        <p className="hostel-card-address text-sm text-muted-color"> {hostel.location?.address}</p>
         
         <div className="hostel-card-rating-row flex items-center gap-sm">
           <Rating rating={hostel.rating} size="sm" />
