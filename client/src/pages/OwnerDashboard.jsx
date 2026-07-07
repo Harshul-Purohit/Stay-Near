@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import api from '../utils/api';
-import Loader from '../components/Loader';
-import Rating from '../components/Rating';
+import Loader from '../components/ui/Loader';
+import Rating from '../components/ui/Rating';
 
 const OwnerDashboard = () => {
   const { user } = useAuth();

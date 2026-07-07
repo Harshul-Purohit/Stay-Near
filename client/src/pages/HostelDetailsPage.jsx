@@ -3,8 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import Rating from '../components/Rating';
-import SkeletonLoader from '../components/SkeletonLoader';
+import Rating from '../components/ui/Rating';
+import SkeletonLoader from '../components/ui/Skeleton';
 
 const HostelDetailsPage = () => {
   const { id } = useParams();

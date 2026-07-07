@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../utils/api';
-import HostelCard from '../components/HostelCard';
-import SkeletonLoader from '../components/SkeletonLoader';
+import HostelCard from '../components/hostel/HostelCard';
+import SkeletonLoader from '../components/ui/Skeleton';
 
 const LandingPage = () => {
   const navigate = useNavigate();

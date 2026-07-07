@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useCompare } from '../context/CompareContext';
-import Rating from '../components/Rating';
+import Rating from '../components/ui/Rating';
 
 const ComparePage = () => {
   const { compareList, removeFromCompare, clearCompare } = useCompare();

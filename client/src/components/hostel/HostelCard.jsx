@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Rating from './Rating';
-import { useCompare } from '../context/CompareContext';
+import Rating from '../ui/Rating';
+import { useCompare } from '../../context/CompareContext';
 
 const HostelCard = ({ hostel }) => {
   const { compareList, addToCompare, removeFromCompare } = useCompare();
