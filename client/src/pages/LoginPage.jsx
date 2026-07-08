@@ -24,9 +24,13 @@ const LoginPage = () => {
     setLoading(false);
     
     if (result && result.success) {
-      // Decode user role redirect
-      // Quick fetch of role from context will happen inside login
-      navigate('/');
+      if (result.user.role === 'admin') {
+        navigate('/admin/dashboard');
+      } else if (result.user.role === 'owner') {
+        navigate('/owner/dashboard');
+      } else {
+        navigate('/student/dashboard');
+      }
     } else {
       setError(result?.message || 'Invalid email or password');
     }

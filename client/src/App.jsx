@@ -5,6 +5,7 @@ import { AuthProvider } from './context/AuthContext';
 import { CompareProvider } from './context/CompareContext';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
+import ProtectedRoute from './components/layout/ProtectedRoute';
 
 // Pages
 import LoginPage from './pages/LoginPage';
@@ -18,6 +19,7 @@ import ComparePage from './pages/ComparePage';
 import StudentDashboard from './pages/StudentDashboard';
 import OwnerDashboard from './pages/OwnerDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminLoginPage from './pages/AdminLoginPage';
 
 function App() {
   return (
@@ -40,11 +42,20 @@ function App() {
                   <Route path="/signup" element={<SignupPage />} />
                   <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                   <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+                  <Route path="/admin/login" element={<AdminLoginPage />} />
 
                   {/* Dashboards */}
-                  <Route path="/dashboard/student" element={<StudentDashboard />} />
-                  <Route path="/dashboard/owner" element={<OwnerDashboard />} />
-                  <Route path="/dashboard/admin" element={<AdminDashboard />} />
+                  <Route element={<ProtectedRoute allowedRoles={['student']} />}>
+                    <Route path="/student/dashboard" element={<StudentDashboard />} />
+                  </Route>
+
+                  <Route element={<ProtectedRoute allowedRoles={['owner']} />}>
+                    <Route path="/owner/dashboard" element={<OwnerDashboard />} />
+                  </Route>
+
+                  <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+                    <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                  </Route>
                 </Routes>
               </main>
               <Footer />

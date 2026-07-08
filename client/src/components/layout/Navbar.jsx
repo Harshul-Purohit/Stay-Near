@@ -18,7 +18,7 @@ const Navbar = ({ logoText = 'StayNear', className = '' }) => {
 
   const getDashboardLink = () => {
     if (!user) return '/login';
-    return `/dashboard/${user.role}`;
+    return `/${user.role}/dashboard`;
   };
 
   return (

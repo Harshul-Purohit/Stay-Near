@@ -66,7 +66,13 @@ const SignupPage = () => {
     setLoading(false);
 
     if (result && result.success) {
-      navigate('/');
+      if (result.user.role === 'admin') {
+        navigate('/admin/dashboard');
+      } else if (result.user.role === 'owner') {
+        navigate('/owner/dashboard');
+      } else {
+        navigate('/student/dashboard');
+      }
     } else {
       setError(result?.message || 'Registration failed. Try again.');
     }
