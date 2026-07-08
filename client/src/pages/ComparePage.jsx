@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useCompare } from '../context/CompareContext';
 import Rating from '../components/ui/Rating';
+import Button from '../components/ui/Button';
 
 const ComparePage = () => {
   const { compareList, removeFromCompare, clearCompare } = useCompare();
@@ -38,12 +39,12 @@ const ComparePage = () => {
     <div className="compare-page container">
       <div className="compare-header flex justify-between items-center" style={{ marginBottom: '30px' }}>
         <div>
-          <h1 className="text-2xl font-bold">Compare Hostels & PGs</h1>
-          <p className="text-sm text-muted-color">Side-by-side comparison of your selected listings</p>
+          <h1 className="text-headline-md font-bold" style={{ color: 'var(--md-sys-color-primary)' }}>Compare Hostels & PGs</h1>
+          <p className="text-body-md" style={{ color: 'var(--md-sys-color-outline)' }}>Side-by-side comparison of your selected listings</p>
         </div>
-        <button onClick={clearCompare} className="btn btn-secondary">
+        <Button onClick={clearCompare} variant="secondary">
           Clear All ({compareList.length})
-        </button>
+        </Button>
       </div>
 
       <div className="compare-table-wrapper card" style={{ padding: '0', overflowX: 'auto' }}>
@@ -66,13 +67,14 @@ const ComparePage = () => {
                       <span className={`badge badge-${hostel.genderType}`} style={{ fontSize: '10px' }}>{hostel.genderType}</span>
                       {hostel.isVerified && <span className="badge badge-verified" style={{ fontSize: '10px' }}>✓ Verified</span>}
                     </div>
-                    <button 
+                    <Button 
                       onClick={() => removeFromCompare(hostel._id)} 
-                      className="text-xs font-semibold" 
-                      style={{ color: 'var(--error-color)', marginTop: '5px' }}
+                      variant="outline"
+                      className="text-xs" 
+                      style={{ marginTop: '5px' }}
                     >
                       Remove
-                    </button>
+                    </Button>
                   </div>
                 </th>
               ))}

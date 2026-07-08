@@ -1,9 +1,9 @@
-﻿import React from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 const Button = ({ children, onClick, className = '', variant = 'primary', ...props }) => {
   return (
-    <button onClick={onClick} className={tn btn- } {...props}>
+    <button onClick={onClick} className={`btn btn-${variant} ${className}`} {...props}>
       {children}
     </button>
   );

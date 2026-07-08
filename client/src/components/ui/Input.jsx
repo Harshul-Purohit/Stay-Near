@@ -1,9 +1,9 @@
-﻿import React from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 const Input = ({ type = 'text', value, onChange, placeholder = '', className = '', ...props }) => {
   return (
-    <input type={type} value={value} onChange={onChange} placeholder={placeholder} className={orm-control } style={{borderColor: 'var(--md-sys-color-outline-variant)'}} {...props} />
+    <input type={type} value={value} onChange={onChange} placeholder={placeholder} className={`form-control ${className}`} style={{borderColor: 'var(--md-sys-color-outline-variant)'}} {...props} />
   );
 };
 

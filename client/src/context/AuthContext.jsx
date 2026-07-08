@@ -36,13 +36,13 @@ export const AuthProvider = ({ children }) => {
     verifyUserSession();
   }, [verifyUserSession]);
 
-  const login = async (email, password) => {
+    const login = async (email, password) => {
     try {
       const res = await api.post('/auth/login', { email, password });
       if (res.data.success) {
         setUser(res.data.user);
         showToast('Welcome back, ' + res.data.user.name + '!', 'success');
-        return { success: true };
+        return { success: true, user: res.data.user };
       }
     } catch (err) {
       const msg = err.response?.data?.message || 'Login failed. Please try again.';
@@ -61,7 +61,7 @@ export const AuthProvider = ({ children }) => {
       if (res.data.success) {
         setUser(res.data.user);
         showToast('Registration successful! Welcome to StayNear.', 'success');
-        return { success: true };
+        return { success: true, user: res.data.user };
       }
     } catch (err) {
       const msg = err.response?.data?.message || 'Sign up failed. Please try again.';

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../utils/api';
 import { useToast } from '../context/ToastContext';
+import Button from '../components/ui/Button';
+import Input from '../components/ui/Input';
 
 const ResetPasswordPage = () => {
   const { token } = useParams();
@@ -46,18 +48,17 @@ const ResetPasswordPage = () => {
   return (
     <div className="auth-page flex justify-center items-center">
       <div className="auth-card card flex flex-col">
-        <h2 className="text-center font-bold text-2xl auth-title">Reset Password</h2>
-        <p className="text-center text-sm text-muted-color auth-subtitle">Enter your new account password</p>
+        <h2 className="text-center text-headline-md auth-title" style={{ color: 'var(--md-sys-color-primary)' }}>Reset Password</h2>
+        <p className="text-center text-body-md auth-subtitle" style={{ color: 'var(--md-sys-color-outline)' }}>Enter your new account password</p>
 
         {error && <div className="form-error text-center" style={{ marginBottom: '15px' }}>{error}</div>}
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-md" style={{ marginTop: '15px' }}>
           <div className="form-group">
             <label className="form-label" htmlFor="reset-pass">New Password</label>
-            <input
+            <Input
               id="reset-pass"
               type="password"
-              className="form-control"
               placeholder="Minimum 6 characters"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -67,10 +68,9 @@ const ResetPasswordPage = () => {
 
           <div className="form-group">
             <label className="form-label" htmlFor="reset-conf-pass">Confirm New Password</label>
-            <input
+            <Input
               id="reset-conf-pass"
               type="password"
-              className="form-control"
               placeholder="Re-enter password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
@@ -78,9 +78,9 @@ const ResetPasswordPage = () => {
             />
           </div>
 
-          <button type="submit" className="btn btn-primary btn-lg" disabled={loading}>
+          <Button type="submit" variant="primary" className="btn-lg" disabled={loading}>
             {loading ? 'Updating password...' : 'Update Password'}
-          </button>
+          </Button>
         </form>
       </div>
     </div>

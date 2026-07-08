@@ -3,6 +3,9 @@ import { useNavigate, Link } from 'react-router-dom';
 import api from '../utils/api';
 import HostelCard from '../components/hostel/HostelCard';
 import SkeletonLoader from '../components/ui/Skeleton';
+import Button from '../components/ui/Button';
+import Input from '../components/ui/Input';
+import Dropdown from '../components/ui/Dropdown';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -83,10 +86,10 @@ const LandingPage = () => {
         <div className="container hero-container grid">
           <div className="hero-content flex flex-col justify-center">
             <span className="hero-tagline badge badge-verified">✓ Verified Campus Housing</span>
-            <h1 className="hero-title text-4xl font-bold">
-              Find Your Perfect Student Hostel Near <span className="highlight-text">JECRC University</span>
+            <h1 className="hero-title text-display font-bold" style={{ color: 'var(--md-sys-color-primary)' }}>
+              Find Your Perfect Student Hostel Near <span className="highlight-text" style={{ color: 'var(--md-sys-color-tertiary)' }}>JECRC University</span>
             </h1>
-            <p className="hero-desc text-lg text-muted-color">
+            <p className="hero-desc text-body-lg" style={{ color: 'var(--md-sys-color-outline)' }}>
               Skip the brokers and shady listings. Directly search, compare pricing, check weekly food menus, and read honest student reviews of hostels in Sitapura, Jaipur.
             </p>
 
@@ -94,8 +97,7 @@ const LandingPage = () => {
             <form onSubmit={handleSearchSubmit} className="hero-search-bar flex items-center card">
               <div className="search-input-group flex-1 flex items-center">
                 <span className="search-icon"></span>
-                <input
-                  type="text"
+                <Input
                   placeholder="Search by PG name, location, landmarks..."
                   className="search-input"
                   value={searchQuery}
@@ -103,20 +105,21 @@ const LandingPage = () => {
                 />
               </div>
               <div className="search-select-group">
-                <select 
+                <Dropdown 
                   className="search-select"
                   value={genderFilter}
                   onChange={(e) => setGenderFilter(e.target.value)}
-                >
-                  <option value="all">Any Gender</option>
-                  <option value="boys">Boys Only</option>
-                  <option value="girls">Girls Only</option>
-                  <option value="co-ed">Co-Ed</option>
-                </select>
+                  options={[
+                    { label: 'Any Gender', value: 'all' },
+                    { label: 'Boys Only', value: 'boys' },
+                    { label: 'Girls Only', value: 'girls' },
+                    { label: 'Co-Ed', value: 'co-ed' }
+                  ]}
+                />
               </div>
-              <button type="submit" className="btn btn-primary hero-search-btn">
+              <Button type="submit" variant="primary" className="hero-search-btn">
                 Search PGs
-              </button>
+              </Button>
             </form>
           </div>
           
@@ -134,8 +137,8 @@ const LandingPage = () => {
       <section className="featured-section container">
         <div className="section-header flex items-center justify-between">
           <div>
-            <h2 className="section-title text-2xl font-bold">Featured verified Hostels</h2>
-            <p className="section-subtitle text-sm text-muted-color">Handpicked, verified listings closest to campus</p>
+            <h2 className="section-title text-headline-md font-bold" style={{ color: 'var(--md-sys-color-primary)' }}>Featured verified Hostels</h2>
+            <p className="section-subtitle text-body-md" style={{ color: 'var(--md-sys-color-outline)' }}>Handpicked, verified listings closest to campus</p>
           </div>
           <Link to="/search" className="btn btn-outline btn-sm">View All PGs</Link>
         </div>

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../utils/api';
 import { useToast } from '../context/ToastContext';
+import Button from '../components/ui/Button';
+import Input from '../components/ui/Input';
 
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState('');
@@ -32,8 +34,8 @@ const ForgotPasswordPage = () => {
   return (
     <div className="auth-page flex justify-center items-center">
       <div className="auth-card card flex flex-col">
-        <h2 className="text-center font-bold text-2xl auth-title">Forgot Password</h2>
-        <p className="text-center text-sm text-muted-color auth-subtitle">
+        <h2 className="text-center text-headline-md auth-title" style={{ color: 'var(--md-sys-color-primary)' }}>Forgot Password</h2>
+        <p className="text-center text-body-md auth-subtitle" style={{ color: 'var(--md-sys-color-outline)' }}>
           Enter your email to receive a password reset link.
         </p>
 
@@ -57,19 +59,18 @@ const ForgotPasswordPage = () => {
           <form onSubmit={handleSubmit} className="flex flex-col gap-md" style={{ marginTop: '15px' }}>
             <div className="form-group">
               <label className="form-label" htmlFor="forgot-email">Email Address</label>
-              <input
+              <Input
                 id="forgot-email"
                 type="email"
-                className="form-control"
                 placeholder="e.g. name@student.university.edu"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
-            <button type="submit" className="btn btn-primary btn-lg" disabled={loading}>
+            <Button type="submit" variant="primary" className="btn-lg" disabled={loading}>
               {loading ? 'Generating link...' : 'Generate Reset Link'}
-            </button>
+            </Button>
           </form>
         )}
 

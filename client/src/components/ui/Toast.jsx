@@ -1,9 +1,9 @@
-﻿import React from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 const Toast = ({ message, type = 'success', onClose }) => {
   return (
-    <div className={	oast toast-}>
+    <div className={`toast toast-${type}`}>
       <span className='toast-message'>{message}</span>
       <button onClick={onClose} className='toast-close'>&times;</button>
     </div>

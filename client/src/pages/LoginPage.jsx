@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-
+import Button from '../components/ui/Button';
+import Input from '../components/ui/Input';
 const LoginPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -34,18 +35,17 @@ const LoginPage = () => {
   return (
     <div className="auth-page flex justify-center items-center">
       <div className="auth-card card flex flex-col">
-        <h2 className="text-center font-bold text-2xl auth-title">Welcome Back</h2>
-        <p className="text-center text-sm text-muted-color auth-subtitle">Log in to find verified student hostels near university</p>
+        <h2 className="text-center text-headline-md auth-title" style={{ color: 'var(--md-sys-color-primary)' }}>Welcome Back</h2>
+        <p className="text-center text-body-md auth-subtitle" style={{ color: 'var(--md-sys-color-outline)' }}>Log in to find verified student hostels near university</p>
         
         {error && <div className="form-error text-center" style={{ marginBottom: '15px' }}>{error}</div>}
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-md">
           <div className="form-group">
             <label className="form-label" htmlFor="login-email">Email Address</label>
-            <input
+            <Input
               id="login-email"
               type="email"
-              className="form-control"
               placeholder="e.g. name@student.university.edu"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -60,10 +60,9 @@ const LoginPage = () => {
                 Forgot Password?
               </Link>
             </div>
-            <input
+            <Input
               id="login-password"
               type="password"
-              className="form-control"
               placeholder="Minimum 6 characters"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -71,9 +70,9 @@ const LoginPage = () => {
             />
           </div>
 
-          <button type="submit" className="btn btn-primary btn-lg" disabled={loading}>
+          <Button type="submit" variant="primary" className="btn-lg" disabled={loading}>
             {loading ? 'Logging in...' : 'Log In'}
-          </button>
+          </Button>
         </form>
 
         <p className="text-center text-sm auth-footer-text" style={{ marginTop: '20px' }}>

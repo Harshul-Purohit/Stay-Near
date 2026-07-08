@@ -1,9 +1,9 @@
-﻿import React from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 const Badge = ({ children, variant = 'verified', className = '' }) => {
   return (
-    <span className={adge badge- }>{children}</span>
+    <span className={`badge badge-${variant} ${className}`}>{children}</span>
   );
 };
 

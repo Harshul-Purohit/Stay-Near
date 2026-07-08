@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-
+import Button from '../components/ui/Button';
+import Input from '../components/ui/Input';
 const SignupPage = () => {
   const { signup } = useAuth();
   const navigate = useNavigate();
@@ -74,36 +75,37 @@ const SignupPage = () => {
   return (
     <div className="auth-page flex justify-center items-center">
       <div className="auth-card card flex flex-col" style={{ maxWidth: '550px' }}>
-        <h2 className="text-center font-bold text-2xl auth-title">Create Account</h2>
-        <p className="text-center text-sm text-muted-color auth-subtitle">Direct, verified comparison of student housing</p>
+        <h2 className="text-center text-headline-md auth-title" style={{ color: 'var(--md-sys-color-primary)' }}>Create Account</h2>
+        <p className="text-center text-body-md auth-subtitle" style={{ color: 'var(--md-sys-color-outline)' }}>Direct, verified comparison of student housing</p>
 
         {error && <div className="form-error text-center" style={{ marginBottom: '15px' }}>{error}</div>}
 
         {/* Role Toggle Selector */}
         <div className="role-selector flex gap-md justify-center" style={{ marginBottom: '20px' }}>
-          <button
+          <Button
             type="button"
-            className={`btn ${role === 'student' ? 'btn-primary' : 'btn-secondary'} flex-1`}
+            variant={role === 'student' ? 'primary' : 'secondary'}
+            className="flex-1"
             onClick={() => { setRole('student'); setError(''); }}
           >
              Student
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
-            className={`btn ${role === 'owner' ? 'btn-primary' : 'btn-secondary'} flex-1`}
+            variant={role === 'owner' ? 'primary' : 'secondary'}
+            className="flex-1"
             onClick={() => { setRole('owner'); setError(''); }}
           >
              Hostel Owner
-          </button>
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-md" encType="multipart/form-data">
           <div className="form-group">
             <label className="form-label" htmlFor="signup-name">Full Name</label>
-            <input
+            <Input
               id="signup-name"
               type="text"
-              className="form-control"
               placeholder="e.g. Rahul Sharma"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -113,10 +115,9 @@ const SignupPage = () => {
 
           <div className="form-group">
             <label className="form-label" htmlFor="signup-email">Email Address</label>
-            <input
+            <Input
               id="signup-email"
               type="email"
-              className="form-control"
               placeholder="e.g. rahul.sharma@jecrc.edu.in"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -127,10 +128,9 @@ const SignupPage = () => {
           <div className="form-group grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
             <div>
               <label className="form-label" htmlFor="signup-password">Password</label>
-              <input
+              <Input
                 id="signup-password"
                 type="password"
-                className="form-control"
                 placeholder="Min 6 chars"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -139,10 +139,9 @@ const SignupPage = () => {
             </div>
             <div>
               <label className="form-label" htmlFor="signup-conf-password">Confirm Password</label>
-              <input
+              <Input
                 id="signup-conf-password"
                 type="password"
-                className="form-control"
                 placeholder="Match password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -161,22 +160,20 @@ const SignupPage = () => {
               <div className="flex flex-col gap-md">
                 <div className="form-group">
                   <label className="form-label" htmlFor="doc-collegeId">College Student ID Card (Required)</label>
-                  <input
+                  <Input
                     id="doc-collegeId"
                     type="file"
                     accept="image/*,.pdf"
-                    className="form-control"
                     onChange={(e) => setCollegeId(e.target.files[0])}
                     required
                   />
                 </div>
                 <div className="form-group">
                   <label className="form-label" htmlFor="doc-feeReceipt">College Fee Receipt (Optional)</label>
-                  <input
+                  <Input
                     id="doc-feeReceipt"
                     type="file"
                     accept="image/*,.pdf"
-                    className="form-control"
                     onChange={(e) => setFeeReceipt(e.target.files[0])}
                   />
                 </div>
@@ -185,22 +182,20 @@ const SignupPage = () => {
               <div className="flex flex-col gap-md">
                 <div className="form-group">
                   <label className="form-label" htmlFor="doc-govtId">Government ID Card (Aadhaar / PAN) (Required)</label>
-                  <input
+                  <Input
                     id="doc-govtId"
                     type="file"
                     accept="image/*,.pdf"
-                    className="form-control"
                     onChange={(e) => setGovtId(e.target.files[0])}
                     required
                   />
                 </div>
                 <div className="form-group">
                   <label className="form-label" htmlFor="doc-businessProof">Hostel Ownership / Business License (Required)</label>
-                  <input
+                  <Input
                     id="doc-businessProof"
                     type="file"
                     accept="image/*,.pdf"
-                    className="form-control"
                     onChange={(e) => setBusinessProof(e.target.files[0])}
                     required
                   />
@@ -209,9 +204,9 @@ const SignupPage = () => {
             )}
           </div>
 
-          <button type="submit" className="btn btn-primary btn-lg" disabled={loading} style={{ marginTop: '10px' }}>
+          <Button type="submit" variant="primary" className="btn-lg" disabled={loading} style={{ marginTop: '10px' }}>
             {loading ? 'Registering Account...' : 'Complete Sign Up'}
-          </button>
+          </Button>
         </form>
 
         <p className="text-center text-sm auth-footer-text" style={{ marginTop: '20px' }}>

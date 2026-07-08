@@ -3,6 +3,9 @@ import { useSearchParams } from 'react-router-dom';
 import api from '../utils/api';
 import HostelCard from '../components/hostel/HostelCard';
 import SkeletonLoader from '../components/ui/Skeleton';
+import Button from '../components/ui/Button';
+import Input from '../components/ui/Input';
+import Dropdown from '../components/ui/Dropdown';
 
 const SearchPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -84,43 +87,43 @@ const SearchPage = () => {
     <div className="search-page-container container">
       <div className="search-header-row flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Discover Hostels & PGs</h1>
-          <p className="text-sm text-muted-color">Showing verified student housing around JECRC University</p>
+          <h1 className="text-headline-md font-bold" style={{ color: 'var(--md-sys-color-primary)' }}>Discover Hostels & PGs</h1>
+          <p className="text-body-md" style={{ color: 'var(--md-sys-color-outline)' }}>Showing verified student housing around JECRC University</p>
         </div>
         <div className="sort-group flex items-center gap-sm">
-          <label htmlFor="sort-dropdown" className="text-sm font-medium text-muted-color">Sort By:</label>
-          <select
+          <label htmlFor="sort-dropdown" className="text-label-md font-medium text-muted-color">Sort By:</label>
+          <Dropdown
             id="sort-dropdown"
             className="form-control"
             style={{ width: '180px', padding: '6px 12px' }}
             value={sort}
             onChange={(e) => { setSort(e.target.value); applyFilters(); }}
-          >
-            <option value="newest">Newest First</option>
-            <option value="priceAsc">Price: Low to High</option>
-            <option value="priceDesc">Price: High to Low</option>
-            <option value="rating">Top Rated</option>
-          </select>
+            options={[
+              { label: 'Newest First', value: 'newest' },
+              { label: 'Price: Low to High', value: 'priceAsc' },
+              { label: 'Price: High to Low', value: 'priceDesc' },
+              { label: 'Top Rated', value: 'rating' }
+            ]}
+          />
         </div>
       </div>
 
       <div className="search-layout grid">
         {/* Sidebar Filters */}
         <aside className="filters-sidebar card flex flex-col gap-lg">
-          <div className="flex justify-between items-center" style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '10px' }}>
-            <h3 className="font-semibold text-base">Filters</h3>
-            <button onClick={handleResetFilters} className="text-sm font-semibold" style={{ color: 'var(--primary-color)' }}>
+          <div className="flex justify-between items-center" style={{ borderBottom: '1px solid var(--md-sys-color-outline-variant)', paddingBottom: '10px' }}>
+            <h3 className="font-semibold text-title-md" style={{ color: 'var(--md-sys-color-on-surface)' }}>Filters</h3>
+            <Button variant="outline" onClick={handleResetFilters} className="text-label-md font-semibold" style={{ color: 'var(--md-sys-color-primary)' }}>
               Reset All
-            </button>
+            </Button>
           </div>
 
           {/* Text Search inside filters */}
           <div className="form-group">
             <label className="form-label" htmlFor="filter-search">Search Name / Area</label>
-            <input
+            <Input
               id="filter-search"
               type="text"
-              className="form-control"
               placeholder="e.g. Sitapura"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -130,33 +133,35 @@ const SearchPage = () => {
           {/* Gender Filter */}
           <div className="form-group">
             <label className="form-label" htmlFor="filter-gender">Hostel Gender</label>
-            <select
+            <Dropdown
               id="filter-gender"
               className="form-control"
               value={genderType}
               onChange={(e) => setGenderType(e.target.value)}
-            >
-              <option value="all">Any Gender</option>
-              <option value="boys">Boys Only</option>
-              <option value="girls">Girls Only</option>
-              <option value="co-ed">Co-Ed</option>
-            </select>
+              options={[
+                { label: 'Any Gender', value: 'all' },
+                { label: 'Boys Only', value: 'boys' },
+                { label: 'Girls Only', value: 'girls' },
+                { label: 'Co-Ed', value: 'co-ed' }
+              ]}
+            />
           </div>
 
           {/* Room Capacity */}
           <div className="form-group">
             <label className="form-label" htmlFor="filter-room-capacity">Room Capacity</label>
-            <select
+            <Dropdown
               id="filter-room-capacity"
               className="form-control"
               value={roomType}
               onChange={(e) => setRoomType(e.target.value)}
-            >
-              <option value="all">Any sharing type</option>
-              <option value="Single">Single Sharing</option>
-              <option value="Double">Double Sharing</option>
-              <option value="Triple">Triple Sharing</option>
-            </select>
+              options={[
+                { label: 'Any sharing type', value: 'all' },
+                { label: 'Single Sharing', value: 'Single' },
+                { label: 'Double Sharing', value: 'Double' },
+                { label: 'Triple Sharing', value: 'Triple' }
+              ]}
+            />
           </div>
 
           {/* Budget Range Slider */}
@@ -196,9 +201,9 @@ const SearchPage = () => {
             </div>
           </div>
 
-          <button onClick={applyFilters} className="btn btn-primary btn-lg">
+          <Button onClick={applyFilters} variant="primary" className="btn-lg">
             Apply Filters
-          </button>
+          </Button>
         </aside>
 
         {/* Results Listings Grid */}
@@ -222,13 +227,13 @@ const SearchPage = () => {
             /* Empty State Container */
             <div className="empty-state card text-center flex flex-col items-center gap-md">
               <span className="empty-icon" style={{ fontSize: '48px' }}></span>
-              <h3 className="font-bold text-lg">No Listings Found</h3>
-              <p className="text-sm text-muted-color" style={{ maxWidth: '400px' }}>
+              <h3 className="font-bold text-title-md">No Listings Found</h3>
+              <p className="text-body-md" style={{ maxWidth: '400px', color: 'var(--md-sys-color-outline)' }}>
                 We couldn't find any hostels matching your specific filters. Try loosening your budget or searching by area.
               </p>
-              <button onClick={handleResetFilters} className="btn btn-primary">
+              <Button onClick={handleResetFilters} variant="primary">
                 Clear Filters
-              </button>
+              </Button>
             </div>
           )}
         </main>
