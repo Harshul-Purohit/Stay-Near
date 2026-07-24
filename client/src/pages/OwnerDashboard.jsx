@@ -4,6 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import api from '../utils/api';
 import Loader from '../components/ui/Loader';
+import Tabs from '../components/ui/Tabs';
+import ImageUpload from '../components/ui/ImageUpload';
 import Rating from '../components/ui/Rating';
 
 const OwnerDashboard = () => {
@@ -42,6 +44,9 @@ const OwnerDashboard = () => {
   // Reply states
   const [replyText, setReplyText] = useState('');
   const [replyingReviewId, setReplyingReviewId] = useState('');
+
+  // Active Tab
+  const [activeTab, setActiveTab] = useState('hostel');
 
   const facilityOptions = [
     'Wi-Fi', 'AC', 'Gym', 'Laundry', 'Power Backup', 'RO Water', 'CCTV Security', '3 Meals Daily'
@@ -195,7 +200,71 @@ const OwnerDashboard = () => {
         )}
       </div>
 
-      <div className="dashboard-grid grid" style={{ gridTemplateColumns: '1.8fr 1.2fr', gap: '30px' }}>
+      <Tabs 
+        activeTab={activeTab} 
+        onTabChange={setActiveTab} 
+        tabs={[
+          { id: 'profile', label: 'My Profile' },
+          { id: 'hostel', label: 'My Hostel' },
+          { id: 'bookings', label: 'Booking Requests' },
+          { id: 'reviews', label: 'Student Reviews' }
+        ]} 
+      />
+
+      {activeTab === 'profile' && (
+        <div className="card flex flex-col gap-md animate-fade-in">
+          <h3 className="font-bold text-lg mb-2">Owner Profile & Settings</h3>
+          <div className="form-group max-w-sm">
+            <label className="form-label">Update Name</label>
+            <input type="text" className="form-control" defaultValue={user.name} />
+          </div>
+          <div className="form-group max-w-sm">
+            <label className="form-label">Contact Email</label>
+            <input type="email" className="form-control" defaultValue={user.email} disabled />
+          </div>
+          <div className="form-group max-w-sm mt-2">
+            <label className="form-label">Business Documents</label>
+            <p className="text-xs text-muted-color mb-2">Upload Govt ID and Hostel License to verify your property.</p>
+            <div className="flex gap-md">
+              <ImageUpload label="Govt ID" onUpload={(files) => showToast('Document selected', 'success')} />
+              <ImageUpload label="Business License" onUpload={(files) => showToast('Document selected', 'success')} />
+            </div>
+          </div>
+          <button className="btn btn-primary mt-4 self-start" onClick={() => showToast('Profile updated successfully', 'success')}>Save Profile</button>
+        </div>
+      )}
+
+      {activeTab === 'bookings' && (
+        <div className="card animate-fade-in">
+          <h3 className="font-bold text-lg mb-4">Incoming Booking Requests</h3>
+          <div className="flex flex-col gap-md">
+            <div className="booking-card flex flex-col md:flex-row justify-between items-start md:items-center p-4 rounded" style={{ border: '1px solid var(--border-color)' }}>
+              <div>
+                <h4 className="font-bold text-md text-primary">Student: Rahul Kumar</h4>
+                <p className="text-xs text-muted-color mt-1">Single Bed Sharing • Requested on {new Date().toLocaleDateString()}</p>
+                <p className="text-sm font-medium mt-1">Move-in Date: {new Date(new Date().setDate(new Date().getDate() + 5)).toLocaleDateString()}</p>
+              </div>
+              <div className="flex gap-sm mt-3 md:mt-0">
+                <button className="btn btn-primary btn-sm" onClick={() => showToast('Booking Approved', 'success')}>Approve</button>
+                <button className="btn btn-secondary btn-sm" onClick={() => showToast('Booking Rejected', 'error')} style={{ color: 'var(--error-color)' }}>Reject</button>
+              </div>
+            </div>
+            <div className="booking-card flex flex-col md:flex-row justify-between items-start md:items-center p-4 rounded bg-surface-container">
+              <div>
+                <h4 className="font-bold text-md text-primary">Student: Amit Singh</h4>
+                <p className="text-xs text-muted-color mt-1">Double Bed Sharing • Requested on {new Date(new Date().setDate(new Date().getDate() - 2)).toLocaleDateString()}</p>
+                <p className="text-sm font-medium mt-1">Move-in Date: {new Date(new Date().setDate(new Date().getDate() + 10)).toLocaleDateString()}</p>
+              </div>
+              <div className="flex flex-col items-end gap-xs mt-3 md:mt-0">
+                <span className="badge badge-verified">Approved</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'hostel' && (
+      <div className="dashboard-grid grid animate-fade-in" style={{ gridTemplateColumns: '1fr', gap: '30px' }}>
         {/* Hostel Listing Setup Form */}
         <main className="dashboard-main card">
           <h3 className="font-bold text-lg" style={{ marginBottom: '20px' }}>
@@ -338,14 +407,16 @@ const OwnerDashboard = () => {
               </div>
             </div>
 
-            <button type="submit" className="btn btn-primary btn-lg" style={{ marginTop: '15px' }}>
-              {hostel ? 'Save Listing Modifications' : 'Register Hostel'}
+            <button type="submit" className="btn btn-primary btn-lg" style={{ marginTop: '15px' }} disabled={loading}>
+              {loading ? 'Saving Listing...' : (hostel ? 'Save Listing Modifications' : 'Register Hostel')}
             </button>
           </form>
         </main>
+      </div>
+      )}
 
-        {/* Reviews and replies panel */}
-        <aside className="dashboard-sidebar flex flex-col gap-lg">
+      {activeTab === 'reviews' && (
+        <div className="dashboard-sidebar flex flex-col gap-lg animate-fade-in">
           <div className="card">
             <h3 className="font-bold text-lg" style={{ marginBottom: '15px' }}>Student Reviews & Feedbacks</h3>
             
@@ -397,8 +468,8 @@ const OwnerDashboard = () => {
               </p>
             )}
           </div>
-        </aside>
-      </div>
+        </div>
+      )}
     </div>
   );
 };

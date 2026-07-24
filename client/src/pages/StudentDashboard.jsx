@@ -5,7 +5,8 @@ import { useToast } from '../context/ToastContext';
 import api from '../utils/api';
 import Rating from '../components/ui/Rating';
 import Loader from '../components/ui/Loader';
-
+import Tabs from '../components/ui/Tabs';
+import ImageUpload from '../components/ui/ImageUpload';
 const StudentDashboard = () => {
   const { user } = useAuth();
   const { showToast } = useToast();
@@ -21,6 +22,9 @@ const StudentDashboard = () => {
   const [reportingHostelId, setReportingHostelId] = useState('');
   const [reportReason, setReportReason] = useState('');
   const [reportModalOpen, setReportModalOpen] = useState(false);
+
+  // Active Tab State
+  const [activeTab, setActiveTab] = useState('profile');
 
   useEffect(() => {
     if (!user) {
@@ -154,9 +158,94 @@ const StudentDashboard = () => {
           </div>
         </aside>
 
-        {/* Reviews List / Actions */}
+        {/* Main Content Area */}
         <main className="dashboard-main flex flex-col gap-lg">
-          <div className="card">
+          <Tabs 
+            activeTab={activeTab} 
+            onTabChange={setActiveTab} 
+            tabs={[
+              { id: 'profile', label: 'My Profile' },
+              { id: 'bookings', label: 'My Bookings' },
+              { id: 'wishlist', label: 'Saved Hostels' },
+              { id: 'reviews', label: 'My Reviews' },
+              { id: 'settings', label: 'Settings' }
+            ]} 
+          />
+
+          {activeTab === 'profile' && (
+            <div className="card flex flex-col gap-md animate-fade-in">
+              <h3 className="font-bold text-lg border-bottom pb-2">Profile Verification</h3>
+              <p className="text-sm text-muted-color">Upload your college ID and fee receipt to verify your student status. Verified students get priority access to hostel bookings.</p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-md mt-4">
+                <div>
+                  <h4 className="font-semibold text-sm mb-2">College ID Card</h4>
+                  <ImageUpload label="Upload ID Card Front" onUpload={(files) => showToast('File selected for upload', 'success')} />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-sm mb-2">Latest Fee Receipt</h4>
+                  <ImageUpload label="Upload Fee Receipt" onUpload={(files) => showToast('File selected for upload', 'success')} />
+                </div>
+              </div>
+              <button className="btn btn-primary mt-4 self-start" onClick={() => showToast('Documents submitted for verification', 'success')}>Submit Documents</button>
+            </div>
+          )}
+
+          {activeTab === 'bookings' && (
+            <div className="card animate-fade-in">
+              <h3 className="font-bold text-lg mb-4">My Bookings</h3>
+              <div className="flex flex-col gap-md">
+                <div className="booking-card flex flex-col md:flex-row justify-between items-start md:items-center p-4 rounded" style={{ border: '1px solid var(--border-color)' }}>
+                  <div>
+                    <h4 className="font-bold text-md text-primary">Royal Boys Residency</h4>
+                    <p className="text-xs text-muted-color mt-1">Double Bed Sharing • Requested on {new Date().toLocaleDateString()}</p>
+                    <p className="text-sm font-medium mt-1">Move-in Date: {new Date(new Date().setDate(new Date().getDate() + 5)).toLocaleDateString()}</p>
+                  </div>
+                  <div className="flex flex-col items-end gap-xs mt-3 md:mt-0">
+                    <span className="badge badge-girls">Pending Approval</span>
+                    <button className="text-xs text-error-color font-semibold mt-2 hover:underline">Cancel Request</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'wishlist' && (
+            <div className="card animate-fade-in">
+              <h3 className="font-bold text-lg mb-4">Saved Hostels</h3>
+              <div className="text-center py-10 flex flex-col items-center justify-center">
+                 <span style={{ fontSize: '48px', color: 'var(--text-muted)', marginBottom: '15px' }}>♡</span>
+                 <p className="text-muted-color">Your wishlist is currently empty. Go to the search page to explore hostels.</p>
+                 <button onClick={() => navigate('/search')} className="btn btn-secondary mt-4">Explore Hostels</button>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'settings' && (
+            <div className="card flex flex-col gap-md animate-fade-in">
+              <h3 className="font-bold text-lg mb-2">Account Settings</h3>
+              
+              <div className="form-group max-w-sm">
+                <label className="form-label">Update Name</label>
+                <input type="text" className="form-control" defaultValue={user.name} />
+              </div>
+              
+              <div className="form-group max-w-sm">
+                <label className="form-label">New Password</label>
+                <input type="password" className="form-control" placeholder="••••••••" />
+              </div>
+
+              <div className="form-group max-w-sm">
+                <label className="form-label">Confirm New Password</label>
+                <input type="password" className="form-control" placeholder="••••••••" />
+              </div>
+
+              <button className="btn btn-primary mt-2 self-start" onClick={() => showToast('Settings updated', 'success')}>Save Changes</button>
+            </div>
+          )}
+
+          {activeTab === 'reviews' && (
+          <div className="card animate-fade-in">
             <h3 className="font-bold text-lg" style={{ marginBottom: '15px' }}>Your Hostel Reviews ({reviews.length})</h3>
 
             {editingReview ? (
@@ -211,6 +300,7 @@ const StudentDashboard = () => {
               </p>
             )}
           </div>
+          )}
         </main>
       </div>
 

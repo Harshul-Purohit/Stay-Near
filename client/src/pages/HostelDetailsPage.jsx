@@ -5,6 +5,8 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import Rating from '../components/ui/Rating';
 import SkeletonLoader from '../components/ui/Skeleton';
+import Breadcrumb from '../components/ui/Breadcrumb';
+import Accordion from '../components/ui/Accordion';
 
 const HostelDetailsPage = () => {
   const { id } = useParams();
@@ -21,8 +23,39 @@ const HostelDetailsPage = () => {
   const [newComment, setNewComment] = useState('');
   const [submitLoading, setSubmitLoading] = useState(false);
 
-  // Accordion for weekly menu
-  const [menuOpen, setMenuOpen] = useState(false);
+  // Booking & Wishlist state
+  const [isWishlisted, setIsWishlisted] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [bookingLoading, setBookingLoading] = useState(false);
+
+  const handleWishlistToggle = () => {
+    if (!user) {
+      showToast('Please login to save hostels.', 'warning');
+      return;
+    }
+    setIsWishlisted(!isWishlisted);
+    showToast(isWishlisted ? 'Removed from wishlist' : 'Added to wishlist', 'success');
+  };
+
+  const handleBooking = (e) => {
+    e.preventDefault();
+    if (!user) {
+      showToast('Please login to book a room.', 'warning');
+      return;
+    }
+    if (!selectedRoom || !startDate) {
+      showToast('Please select a room and start date.', 'warning');
+      return;
+    }
+    setBookingLoading(true);
+    setTimeout(() => {
+      showToast('Booking request sent successfully! Awaiting owner approval.', 'success');
+      setBookingLoading(false);
+      setSelectedRoom('');
+      setStartDate('');
+    }, 1000);
+  };
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -99,26 +132,34 @@ const HostelDetailsPage = () => {
     : ['https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&q=80&w=1200'];
 
   return (
-    <div className="hostel-details-page container">
+    <div className="hostel-details-page container" style={{ paddingBottom: '60px' }}>
       {/* Breadcrumb */}
-      <div className="breadcrumb text-sm text-muted-color" style={{ marginBottom: '20px' }}>
-        <Link to="/" className="nav-link" style={{ display: 'inline' }}>Home</Link> &gt;{' '}
-        <Link to="/search" className="nav-link" style={{ display: 'inline' }}>Hostels</Link> &gt;{' '}
-        <span className="font-medium text-primary">{hostel.name}</span>
-      </div>
+      <Breadcrumb paths={[
+        { label: 'Home', url: '/' },
+        { label: 'Hostels', url: '/search' },
+        { label: hostel.name, url: '#' }
+      ]} />
 
       {/* Title Header */}
-      <div className="details-header flex justify-between items-start flex-wrap gap-md">
+      <div className="details-header flex justify-between items-start flex-wrap gap-md mt-2">
         <div>
           <div className="flex items-center gap-sm flex-wrap">
             <h1 className="text-3xl font-bold">{hostel.name}</h1>
             <span className={`badge badge-${hostel.genderType}`}>{hostel.genderType}</span>
-            {hostel.isVerified && <span className="badge badge-verified">✓ Verified by StayNear</span>}
+            {hostel.isVerified && <span className="badge badge-verified">✓ Verified</span>}
           </div>
           <p className="text-muted-color" style={{ marginTop: '5px' }}> {hostel.location?.address}</p>
         </div>
         
         <div className="flex items-center gap-md">
+          <button 
+            onClick={handleWishlistToggle}
+            className="btn btn-secondary flex items-center justify-center rounded"
+            style={{ width: '40px', height: '40px', padding: 0, color: isWishlisted ? 'var(--error-color)' : 'var(--text-muted)' }}
+            title="Save to Wishlist"
+          >
+            <span style={{ fontSize: '24px', lineHeight: 1 }}>{isWishlisted ? '♥' : '♡'}</span>
+          </button>
           <div className="details-rating-box card flex items-center gap-sm" style={{ padding: '10px 15px' }}>
             <span className="font-bold text-xl" style={{ color: '#ffb400' }}>★ {hostel.rating || '0.0'}</span>
             <span className="text-xs text-muted-color">({hostel.reviewCount || 0} reviews)</span>
@@ -149,25 +190,42 @@ const HostelDetailsPage = () => {
 
         {/* Quick Booking Sidebar */}
         <aside className="booking-sidebar card flex flex-col gap-md">
-          <h3 className="font-bold text-lg">Contact Information</h3>
-          <p className="text-sm text-muted-color">Get in touch directly with the verified hostel owner below.</p>
+          <h3 className="font-bold text-lg">Book Your Stay</h3>
+          <p className="text-sm text-muted-color">Request a booking directly with the owner.</p>
           
+          <form onSubmit={handleBooking} className="flex flex-col gap-md" style={{ backgroundColor: 'var(--bg-color)', padding: '15px', borderRadius: '8px' }}>
+            <div className="form-group mb-0">
+              <label className="form-label" style={{ marginBottom: '5px' }}>Select Room Type</label>
+              <select className="form-control" value={selectedRoom} onChange={(e) => setSelectedRoom(e.target.value)} required>
+                <option value="">-- Choose a Room --</option>
+                {hostel.roomTypes?.filter(r => r.available).map((room, idx) => (
+                  <option key={idx} value={room.type}>{room.type} - ₹{room.price.toLocaleString('en-IN')}/mo</option>
+                ))}
+              </select>
+            </div>
+            <div className="form-group mb-0">
+              <label className="form-label" style={{ marginBottom: '5px' }}>Move-in Date</label>
+              <input type="date" className="form-control" value={startDate} onChange={(e) => setStartDate(e.target.value)} required />
+            </div>
+            <button type="submit" className="btn btn-primary w-full mt-2" disabled={bookingLoading}>
+              {bookingLoading ? 'Processing...' : 'Request Booking'}
+            </button>
+          </form>
+
+          <hr className="my-2 border-outline-variant" style={{ borderTop: '1px solid var(--border-color)' }} />
+          
+          <h4 className="font-semibold text-sm">Contact Information</h4>
           {user ? (
-            <div className="owner-details-box flex flex-col gap-sm" style={{ backgroundColor: 'var(--bg-color)', padding: '15px', borderRadius: '8px' }}>
-              <div>
-                <span className="text-xs text-muted-color">Owner Name</span>
-                <div className="font-medium text-sm">{hostel.owner?.name || 'Verified Owner'}</div>
-              </div>
-              <div>
-                <span className="text-xs text-muted-color">Contact Helpline</span>
-                <div className="font-bold text-base" style={{ color: 'var(--primary-color)' }}>{hostel.contactNumber}</div>
-              </div>
+            <div className="owner-details-box flex flex-col gap-xs">
+              <span className="text-sm text-muted-color">Owner Name</span>
+              <div className="font-medium text-sm">{hostel.owner?.name || 'Verified Owner'}</div>
+              <span className="text-sm text-muted-color mt-2">Contact Helpline</span>
+              <div className="font-bold text-base text-primary">{hostel.contactNumber}</div>
             </div>
           ) : (
-            <div className="login-to-view text-center flex flex-col gap-sm" style={{ backgroundColor: '#fff8f8', padding: '15px', borderRadius: '8px' }}>
-              <span style={{ fontSize: '24px' }}></span>
+            <div className="login-to-view text-center flex flex-col gap-sm" style={{ backgroundColor: 'var(--surface-color)', padding: '15px', borderRadius: '8px' }}>
               <p className="text-xs text-muted-color">Student credentials required to view contact details.</p>
-              <Link to="/login" className="btn btn-sm btn-primary">Log In to View</Link>
+              <Link to="/login" className="btn btn-sm btn-secondary w-full justify-center">Log In to View</Link>
             </div>
           )}
 
@@ -175,8 +233,7 @@ const HostelDetailsPage = () => {
             href={`https://www.google.com/maps/search/?api=1&query=${hostel.location?.lat},${hostel.location?.lng}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn btn-secondary flex justify-center"
-            style={{ width: '100%' }}
+            className="btn btn-secondary flex justify-center mt-2 w-full"
           >
              View on Google Maps
           </a>
@@ -214,60 +271,43 @@ const HostelDetailsPage = () => {
 
       {/* Mess Menu Accordion */}
       <section className="details-section" style={{ marginTop: '40px' }}>
-        <button 
-          className="menu-accordion-btn card flex items-center justify-between" 
-          style={{ width: '100%', padding: '15px 20px', cursor: 'pointer', textAlign: 'left' }}
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          <div className="flex items-center gap-md">
-            <span style={{ fontSize: '24px' }}></span>
-            <div>
-              <h3 className="font-bold text-base">Weekly Mess Food Menu</h3>
-              <p className="text-xs text-muted-color">View breakfast, lunch, and dinner timetables</p>
+        <Accordion title="Weekly Mess Food Menu" subtitle="View breakfast, lunch, and dinner timetables" icon="🍲">
+          <div className="meal-timings-grid grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px', paddingBottom: '15px', borderBottom: '1px solid var(--border-color)' }}>
+            <div className="text-center">
+              <span className="font-semibold text-xs text-muted-color">Breakfast</span>
+              <p className="text-sm font-medium">{hostel.mealTimings?.breakfast || '8:00 AM - 9:30 AM'}</p>
+            </div>
+            <div className="text-center">
+              <span className="font-semibold text-xs text-muted-color">Lunch</span>
+              <p className="text-sm font-medium">{hostel.mealTimings?.lunch || '1:00 PM - 2:30 PM'}</p>
+            </div>
+            <div className="text-center">
+              <span className="font-semibold text-xs text-muted-color">Dinner</span>
+              <p className="text-sm font-medium">{hostel.mealTimings?.dinner || '8:00 PM - 9:30 PM'}</p>
             </div>
           </div>
-          <span style={{ transform: menuOpen ? 'rotate(180deg)' : 'none', transition: 'var(--transition-fast)' }}>▼</span>
-        </button>
-        
-        {menuOpen && (
-          <div className="card menu-accordion-body" style={{ marginTop: '10px', borderTop: 'none' }}>
-            <div className="meal-timings-grid grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px', paddingBottom: '15px', borderBottom: '1px solid var(--border-color)' }}>
-              <div className="text-center">
-                <span className="font-semibold text-xs text-muted-color">Breakfast</span>
-                <p className="text-sm font-medium">{hostel.mealTimings?.breakfast || '8:00 AM - 9:30 AM'}</p>
-              </div>
-              <div className="text-center">
-                <span className="font-semibold text-xs text-muted-color">Lunch</span>
-                <p className="text-sm font-medium">{hostel.mealTimings?.lunch || '1:00 PM - 2:30 PM'}</p>
-              </div>
-              <div className="text-center">
-                <span className="font-semibold text-xs text-muted-color">Dinner</span>
-                <p className="text-sm font-medium">{hostel.mealTimings?.dinner || '8:00 PM - 9:30 PM'}</p>
-              </div>
-            </div>
-            
-            <div className="menu-table-wrapper" style={{ overflowX: 'auto', marginTop: '15px' }}>
-              <table className="menu-table" style={{ width: '100%', borderCollapse: 'collapse', minWidth: '500px' }}>
-                <thead>
-                  <tr style={{ borderBottom: '2px solid var(--border-color)', textAlign: 'left' }}>
-                    <th style={{ padding: '8px' }}>Day</th>
-                    <th style={{ padding: '8px' }}>Items Scheduled</th>
+          
+          <div className="menu-table-wrapper" style={{ overflowX: 'auto', marginTop: '15px' }}>
+            <table className="menu-table" style={{ width: '100%', borderCollapse: 'collapse', minWidth: '500px' }}>
+              <thead>
+                <tr style={{ borderBottom: '2px solid var(--border-color)', textAlign: 'left' }}>
+                  <th style={{ padding: '12px 8px', color: 'var(--text-muted)' }}>Day</th>
+                  <th style={{ padding: '12px 8px', color: 'var(--text-muted)' }}>Items Scheduled</th>
+                </tr>
+              </thead>
+              <tbody>
+                {['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map((day) => (
+                  <tr key={day} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                    <td style={{ padding: '12px 8px', textTransform: 'capitalize', fontWeight: '500' }}>{day}</td>
+                    <td style={{ padding: '12px 8px', color: 'var(--text-secondary)' }}>
+                      {hostel.weeklyMenu?.[day]?.join(', ') || 'Standard hosteler meals'}
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map((day) => (
-                    <tr key={day} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                      <td style={{ padding: '8px', textTransform: 'capitalize', fontWeight: '500' }}>{day}</td>
-                      <td style={{ padding: '8px', color: 'var(--text-secondary)' }}>
-                        {hostel.weeklyMenu?.[day]?.join(', ') || 'Standard hosteler meals'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           </div>
-        )}
+        </Accordion>
       </section>
 
       {/* Reviews & Ratings Section */}
@@ -325,6 +365,28 @@ const HostelDetailsPage = () => {
           ) : (
             <p className="text-muted-color text-center" style={{ padding: '30px 0' }}>No student reviews yet. Be the first to leave a review!</p>
           )}
+        </div>
+      </section>
+
+      {/* Similar Hostels (Mock UI) */}
+      <section className="details-section" style={{ marginTop: '40px' }}>
+        <h2 className="font-bold text-xl section-title mb-4">Similar Hostels Near JECRC</h2>
+        <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+          {[1,2,3].map((item) => (
+             <div key={item} className="card flex flex-col gap-sm" style={{ padding: 0, overflow: 'hidden' }}>
+                <div style={{ height: '160px', backgroundColor: 'var(--surface-variant)' }}>
+                  <img src="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&q=80&w=400" alt="Hostel" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+                <div style={{ padding: '15px' }} className="flex flex-col gap-xs">
+                  <h4 className="font-bold text-md">Premium {hostel.genderType === 'girls' ? 'Girls' : 'Boys'} Residency</h4>
+                  <p className="text-xs text-muted-color">0.5 km from campus</p>
+                  <div className="flex justify-between items-center mt-2">
+                    <p className="font-semibold text-primary">₹12,000<span className="text-xs font-normal text-muted-color">/mo</span></p>
+                    <Link to="/search" className="text-sm font-semibold" style={{ color: 'var(--primary-color)' }}>View</Link>
+                  </div>
+                </div>
+              </div>
+          ))}
         </div>
       </section>
     </div>

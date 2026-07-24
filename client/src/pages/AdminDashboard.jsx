@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import api from '../utils/api';
 import Loader from '../components/ui/Loader';
 import Rating from '../components/ui/Rating';
+import Tabs from '../components/ui/Tabs';
 
 const AdminDashboard = () => {
   const { user } = useAuth();
@@ -20,7 +21,7 @@ const AdminDashboard = () => {
   // Active tab state
   const [activeTab, setActiveTab] = useState('verifications');
 
-  const fetchAdminData = async () => {
+  const fetchAdminData = useCallback(async () => {
     try {
       // Get Analytics
       const analRes = await api.get('/admin/analytics');
@@ -50,7 +51,7 @@ const AdminDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [showToast]);
 
   useEffect(() => {
     if (!user) {
@@ -63,7 +64,7 @@ const AdminDashboard = () => {
     }
 
     fetchAdminData();
-  }, [user, navigate]);
+  }, [user, navigate, fetchAdminData]);
 
   const handleApproveOwner = async (ownerId, action) => {
     try {
@@ -132,56 +133,22 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Analytics Cards */}
-      {analytics && (
-        <section className="analytics-grid grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '30px' }}>
-          <div className="card text-center">
-            <span className="text-xs text-muted-color font-semibold uppercase">Total Students</span>
-            <div className="text-3xl font-bold" style={{ color: 'var(--primary-color)', marginTop: '5px' }}>
-              {analytics.users?.student || 0}
-            </div>
-          </div>
-          <div className="card text-center">
-            <span className="text-xs text-muted-color font-semibold uppercase">Registered Owners</span>
-            <div className="text-3xl font-bold" style={{ color: 'var(--primary-color)', marginTop: '5px' }}>
-              {analytics.users?.owner || 0}
-            </div>
-          </div>
-          <div className="card text-center">
-            <span className="text-xs text-muted-color font-semibold uppercase">Verified PGs</span>
-            <div className="text-3xl font-bold" style={{ color: 'var(--primary-color)', marginTop: '5px' }}>
-              {analytics.hostels?.verified || 0} / {analytics.hostels?.total || 0}
-            </div>
-          </div>
-          <div className="card text-center">
-            <span className="text-xs text-muted-color font-semibold uppercase">Reported Items</span>
-            <div className="text-3xl font-bold" style={{ color: 'var(--error-color)', marginTop: '5px' }}>
-              {analytics.reviews?.reported || 0}
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* Dashboard Sub-tabs */}
-      <div className="tabs-header flex gap-md" style={{ borderBottom: '1px solid var(--border-color)', marginBottom: '25px', paddingBottom: '10px' }}>
-        <button
-          onClick={() => setActiveTab('verifications')}
-          className={`tab-btn font-semibold text-sm ${activeTab === 'verifications' ? 'tab-active' : ''}`}
-          style={{ padding: '8px 16px', borderBottom: activeTab === 'verifications' ? '2px solid var(--primary-color)' : 'none' }}
-        >
-          Verifications Queues ({pendingOwners.length + pendingHostels.length})
-        </button>
-        <button
-          onClick={() => setActiveTab('reviews')}
-          className={`tab-btn font-semibold text-sm ${activeTab === 'reviews' ? 'tab-active' : ''}`}
-          style={{ padding: '8px 16px', borderBottom: activeTab === 'reviews' ? '2px solid var(--primary-color)' : 'none' }}
-        >
-          Flagged Feedbacks ({reportedReviews.length})
-        </button>
-      </div>
+      <Tabs 
+        activeTab={activeTab} 
+        onTabChange={setActiveTab} 
+        tabs={[
+          { id: 'verifications', label: `Verifications (${pendingOwners.length + pendingHostels.length})` },
+          { id: 'hostel-management', label: 'Hostel Management' },
+          { id: 'users', label: 'Users' },
+          { id: 'analytics', label: 'System Analytics' },
+          { id: 'reviews', label: `Reported Reviews (${reportedReviews.length})` },
+          { id: 'settings', label: 'Settings' }
+        ]} 
+      />
 
-      {activeTab === 'verifications' ? (
-        <div className="grid" style={{ gridTemplateColumns: '1.2fr 1fr', gap: '30px' }}>
+      {activeTab === 'verifications' && (
+        <div className="grid animate-fade-in" style={{ gridTemplateColumns: '1.2fr 1fr', gap: '30px' }}>
           {/* Hostels Verification */}
           <div className="card">
             <h3 className="font-bold text-lg" style={{ marginBottom: '15px' }}>Pending Hostel Approvals ({pendingHostels.length})</h3>
@@ -243,9 +210,69 @@ const AdminDashboard = () => {
             )}
           </div>
         </div>
-      ) : (
-        /* Reported Reviews */
-        <div className="card">
+      )}
+
+      {activeTab === 'analytics' && analytics && (
+        <section className="analytics-grid grid animate-fade-in" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
+          <div className="card text-center">
+            <span className="text-xs text-muted-color font-semibold uppercase">Total Students</span>
+            <div className="text-3xl font-bold" style={{ color: 'var(--primary-color)', marginTop: '5px' }}>
+              {analytics.users?.student || 0}
+            </div>
+          </div>
+          <div className="card text-center">
+            <span className="text-xs text-muted-color font-semibold uppercase">Registered Owners</span>
+            <div className="text-3xl font-bold" style={{ color: 'var(--primary-color)', marginTop: '5px' }}>
+              {analytics.users?.owner || 0}
+            </div>
+          </div>
+          <div className="card text-center">
+            <span className="text-xs text-muted-color font-semibold uppercase">Verified PGs</span>
+            <div className="text-3xl font-bold" style={{ color: 'var(--primary-color)', marginTop: '5px' }}>
+              {analytics.hostels?.verified || 0} / {analytics.hostels?.total || 0}
+            </div>
+          </div>
+          <div className="card text-center">
+            <span className="text-xs text-muted-color font-semibold uppercase">Reported Items</span>
+            <div className="text-3xl font-bold" style={{ color: 'var(--error-color)', marginTop: '5px' }}>
+              {analytics.reviews?.reported || 0}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {activeTab === 'hostel-management' && (
+        <div className="card animate-fade-in">
+          <h3 className="font-bold text-lg mb-4">All Registered Hostels</h3>
+          <p className="text-muted-color text-sm">View and manage all active hostels. (Mock UI)</p>
+          <div className="mt-4 rounded p-8 text-center" style={{ border: '2px dashed var(--border-color)' }}>
+             <span className="text-muted-color">Hostel management table goes here. Integration pending.</span>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'users' && (
+        <div className="card animate-fade-in">
+          <h3 className="font-bold text-lg mb-4">User Management</h3>
+          <p className="text-muted-color text-sm">Manage student and owner accounts. (Mock UI)</p>
+          <div className="mt-4 rounded p-8 text-center" style={{ border: '2px dashed var(--border-color)' }}>
+             <span className="text-muted-color">Users management table goes here. Integration pending.</span>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'settings' && (
+        <div className="card animate-fade-in">
+          <h3 className="font-bold text-lg mb-4">System Settings</h3>
+          <p className="text-muted-color text-sm">Platform configurations and features. (Mock UI)</p>
+          <div className="mt-4 rounded p-8 text-center" style={{ border: '2px dashed var(--border-color)' }}>
+             <span className="text-muted-color">System settings controls go here. Integration pending.</span>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'reviews' && (
+        <div className="card animate-fade-in">
           <h3 className="font-bold text-lg" style={{ marginBottom: '15px' }}>Flagged Reviews Queue ({reportedReviews.length})</h3>
 
           {reportedReviews.length > 0 ? (
