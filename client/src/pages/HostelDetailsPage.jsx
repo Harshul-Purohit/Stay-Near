@@ -23,11 +23,8 @@ const HostelDetailsPage = () => {
   const [newComment, setNewComment] = useState('');
   const [submitLoading, setSubmitLoading] = useState(false);
 
-  // Booking & Wishlist state
+  // Wishlist state
   const [isWishlisted, setIsWishlisted] = useState(false);
-  const [selectedRoom, setSelectedRoom] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [bookingLoading, setBookingLoading] = useState(false);
 
   const handleWishlistToggle = () => {
     if (!user) {
@@ -36,25 +33,6 @@ const HostelDetailsPage = () => {
     }
     setIsWishlisted(!isWishlisted);
     showToast(isWishlisted ? 'Removed from wishlist' : 'Added to wishlist', 'success');
-  };
-
-  const handleBooking = (e) => {
-    e.preventDefault();
-    if (!user) {
-      showToast('Please login to book a room.', 'warning');
-      return;
-    }
-    if (!selectedRoom || !startDate) {
-      showToast('Please select a room and start date.', 'warning');
-      return;
-    }
-    setBookingLoading(true);
-    setTimeout(() => {
-      showToast('Booking request sent successfully! Awaiting owner approval.', 'success');
-      setBookingLoading(false);
-      setSelectedRoom('');
-      setStartDate('');
-    }, 1000);
   };
 
   useEffect(() => {
@@ -190,50 +168,76 @@ const HostelDetailsPage = () => {
 
         {/* Quick Booking Sidebar */}
         <aside className="booking-sidebar card flex flex-col gap-md">
-          <h3 className="font-bold text-lg">Book Your Stay</h3>
-          <p className="text-sm text-muted-color">Request a booking directly with the owner.</p>
+          <h3 className="font-bold text-lg">Contact Owner</h3>
+          <p className="text-sm text-muted-color">Connect with the owner to book a visit or ask questions.</p>
           
-          <form onSubmit={handleBooking} className="flex flex-col gap-md" style={{ backgroundColor: 'var(--bg-color)', padding: '15px', borderRadius: '8px' }}>
-            <div className="form-group mb-0">
-              <label className="form-label" style={{ marginBottom: '5px' }}>Select Room Type</label>
-              <select className="form-control" value={selectedRoom} onChange={(e) => setSelectedRoom(e.target.value)} required>
-                <option value="">-- Choose a Room --</option>
-                {hostel.roomTypes?.filter(r => r.available).map((room, idx) => (
-                  <option key={idx} value={room.type}>{room.type} - ₹{room.price.toLocaleString('en-IN')}/mo</option>
-                ))}
-              </select>
-            </div>
-            <div className="form-group mb-0">
-              <label className="form-label" style={{ marginBottom: '5px' }}>Move-in Date</label>
-              <input type="date" className="form-control" value={startDate} onChange={(e) => setStartDate(e.target.value)} required />
-            </div>
-            <button type="submit" className="btn btn-primary w-full mt-2" disabled={bookingLoading}>
-              {bookingLoading ? 'Processing...' : 'Request Booking'}
-            </button>
-          </form>
-
-          <hr className="my-2 border-outline-variant" style={{ borderTop: '1px solid var(--border-color)' }} />
-          
-          <h4 className="font-semibold text-sm">Contact Information</h4>
           {user ? (
-            <div className="owner-details-box flex flex-col gap-xs">
-              <span className="text-sm text-muted-color">Owner Name</span>
-              <div className="font-medium text-sm">{hostel.owner?.name || 'Verified Owner'}</div>
-              <span className="text-sm text-muted-color mt-2">Contact Helpline</span>
-              <div className="font-bold text-base text-primary">{hostel.contactNumber}</div>
-            </div>
+            <>
+              <div className="flex flex-col gap-md" style={{ backgroundColor: 'var(--bg-color)', padding: '15px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                <div className="flex flex-col gap-xs">
+                  <span className="text-xs font-semibold text-muted-color" style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>Owner Name</span>
+                  <div className="font-medium text-sm text-primary-light">{hostel.owner?.name || 'Verified Owner'}</div>
+                </div>
+                
+                <div className="flex flex-col gap-xs">
+                  <span className="text-xs font-semibold text-muted-color" style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>Phone Number</span>
+                  <div className="font-semibold text-sm text-primary-light">{hostel.contactNumber || 'Not Available'}</div>
+                </div>
+
+                <div className="flex flex-col gap-xs">
+                  <span className="text-xs font-semibold text-muted-color" style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>Email Address</span>
+                  <div className="font-medium text-sm text-primary-light">{hostel.owner?.email || 'Not Available'}</div>
+                </div>
+
+                <div className="flex flex-col gap-xs">
+                  <span className="text-xs font-semibold text-muted-color" style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>WhatsApp Number</span>
+                  <div className="font-medium text-sm text-primary-light">{hostel.whatsappNumber || hostel.contactNumber || 'Not Available'}</div>
+                </div>
+
+                <div className="flex flex-col gap-xs">
+                  <span className="text-xs font-semibold text-muted-color" style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>Hostel Address</span>
+                  <div className="font-medium text-sm text-primary-light">{hostel.location?.address || 'Not Available'}</div>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-sm">
+                {hostel.contactNumber && (
+                  <a href={`tel:${hostel.contactNumber}`} className="btn btn-primary w-full justify-center flex items-center gap-sm">
+                    <span>📞</span> Call Owner
+                  </a>
+                )}
+                {hostel.owner?.email && (
+                  <a href={`mailto:${hostel.owner.email}?subject=Inquiry about ${hostel.name}`} className="btn btn-secondary w-full justify-center flex items-center gap-sm">
+                    <span>✉️</span> Email Owner
+                  </a>
+                )}
+                {(hostel.whatsappNumber || hostel.contactNumber) && (
+                  <a 
+                    href={`https://wa.me/${(hostel.whatsappNumber || hostel.contactNumber).replace(/\D/g, '')}?text=Hi, I am interested in your hostel ${encodeURIComponent(hostel.name)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-secondary w-full justify-center flex items-center gap-sm"
+                    style={{ border: '1px solid #25D366', color: '#25D366' }}
+                  >
+                    <span>💬</span> WhatsApp Owner
+                  </a>
+                )}
+              </div>
+            </>
           ) : (
-            <div className="login-to-view text-center flex flex-col gap-sm" style={{ backgroundColor: 'var(--surface-color)', padding: '15px', borderRadius: '8px' }}>
-              <p className="text-xs text-muted-color">Student credentials required to view contact details.</p>
-              <Link to="/login" className="btn btn-sm btn-secondary w-full justify-center">Log In to View</Link>
+            <div className="login-to-view text-center flex flex-col gap-sm" style={{ backgroundColor: 'var(--surface-color)', padding: '20px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+              <p className="text-sm text-muted-color">Please log in to view the owner's contact details.</p>
+              <Link to="/login" className="btn btn-primary w-full justify-center mt-2">Log In to View</Link>
             </div>
           )}
+
+          <hr className="my-2" style={{ borderTop: '1px solid var(--border-color)' }} />
 
           <a
             href={`https://www.google.com/maps/search/?api=1&query=${hostel.location?.lat},${hostel.location?.lng}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn btn-secondary flex justify-center mt-2 w-full"
+            className="btn btn-secondary flex justify-center w-full"
           >
              View on Google Maps
           </a>
