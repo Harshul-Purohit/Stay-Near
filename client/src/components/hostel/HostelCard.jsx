@@ -2,9 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Rating from '../ui/Rating';
 import { useCompare } from '../../context/CompareContext';
+import { useWishlist } from '../../context/WishlistContext';
 
 const HostelCard = ({ hostel }) => {
   const { compareList, addToCompare, removeFromCompare } = useCompare();
+  const { isInWishlist, toggleWishlist } = useWishlist();
 
   // Find lowest price
   const getStartingPrice = () => {
@@ -14,6 +16,7 @@ const HostelCard = ({ hostel }) => {
   };
 
   const isComparing = compareList.some((h) => h._id === hostel._id);
+  const isSaved = isInWishlist(hostel._id);
 
   const handleCompareClick = (e) => {
     e.preventDefault();
@@ -24,6 +27,12 @@ const HostelCard = ({ hostel }) => {
     }
   };
 
+  const handleWishlistClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleWishlist(hostel);
+  };
+
   // Safe image display
   const displayImage = hostel.images && hostel.images.length > 0 
     ? hostel.images[0] 
@@ -31,9 +40,38 @@ const HostelCard = ({ hostel }) => {
 
   return (
     <div className="hostel-card card flex flex-col">
-      <div className="hostel-card-img-container">
+      <div className="hostel-card-img-container" style={{ position: 'relative' }}>
         <img src={displayImage} alt={hostel.name} className="hostel-card-img" />
         
+        {/* Heart / Save Button */}
+        <button
+          onClick={handleWishlistClick}
+          className="hostel-wishlist-badge-btn"
+          style={{
+            position: 'absolute',
+            top: '10px',
+            right: '10px',
+            background: 'rgba(255, 255, 255, 0.9)',
+            border: 'none',
+            borderRadius: '50%',
+            width: '32px',
+            height: '32px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            boxShadow: 'var(--shadow-sm)',
+            transition: 'var(--transition-fast)',
+            color: isSaved ? 'var(--error-color)' : 'var(--md-sys-color-secondary)',
+            fontSize: '18px',
+            lineHeight: 1,
+            zIndex: 2,
+          }}
+          title={isSaved ? "Remove from Wishlist" : "Save to Wishlist"}
+        >
+          {isSaved ? '♥' : '♡'}
+        </button>
+
         {/* Gender Badge */}
         <span className={`hostel-gender-badge badge badge-${hostel.genderType}`}>
           {hostel.genderType}

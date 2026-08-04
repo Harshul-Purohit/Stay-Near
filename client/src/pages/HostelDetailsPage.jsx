@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { useWishlist } from '../context/WishlistContext';
 import Rating from '../components/ui/Rating';
 import SkeletonLoader from '../components/ui/Skeleton';
 import Breadcrumb from '../components/ui/Breadcrumb';
@@ -12,6 +13,7 @@ const HostelDetailsPage = () => {
   const { id } = useParams();
   const { user } = useAuth();
   const { showToast } = useToast();
+  const { isInWishlist, toggleWishlist } = useWishlist();
 
   const [hostel, setHostel] = useState(null);
   const [reviews, setReviews] = useState([]);
@@ -24,15 +26,12 @@ const HostelDetailsPage = () => {
   const [submitLoading, setSubmitLoading] = useState(false);
 
   // Wishlist state
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const isWishlisted = hostel ? isInWishlist(hostel._id) : false;
 
   const handleWishlistToggle = () => {
-    if (!user) {
-      showToast('Please login to save hostels.', 'warning');
-      return;
+    if (hostel) {
+      toggleWishlist(hostel);
     }
-    setIsWishlisted(!isWishlisted);
-    showToast(isWishlisted ? 'Removed from wishlist' : 'Added to wishlist', 'success');
   };
 
   useEffect(() => {

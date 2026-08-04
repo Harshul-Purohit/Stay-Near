@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { useWishlist } from '../context/WishlistContext';
+import HostelCard from '../components/hostel/HostelCard';
 import api from '../utils/api';
 import Rating from '../components/ui/Rating';
 import Loader from '../components/ui/Loader';
@@ -10,6 +12,7 @@ import ImageUpload from '../components/ui/ImageUpload';
 const StudentDashboard = () => {
   const { user } = useAuth();
   const { showToast } = useToast();
+  const { wishlist } = useWishlist();
   const navigate = useNavigate();
 
   const [reviews, setReviews] = useState([]);
@@ -213,11 +216,19 @@ const StudentDashboard = () => {
           {activeTab === 'wishlist' && (
             <div className="card animate-fade-in">
               <h3 className="font-bold text-lg mb-4">Saved Hostels</h3>
-              <div className="text-center py-10 flex flex-col items-center justify-center">
-                 <span style={{ fontSize: '48px', color: 'var(--text-muted)', marginBottom: '15px' }}>♡</span>
-                 <p className="text-muted-color">Your wishlist is currently empty. Go to the search page to explore hostels.</p>
-                 <button onClick={() => navigate('/search')} className="btn btn-secondary mt-4">Explore Hostels</button>
-              </div>
+              {wishlist.length > 0 ? (
+                <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
+                  {wishlist.map((hostel) => (
+                    <HostelCard key={hostel._id} hostel={hostel} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-10 flex flex-col items-center justify-center">
+                   <span style={{ fontSize: '48px', color: 'var(--text-muted)', marginBottom: '15px' }}>♡</span>
+                   <p className="text-muted-color">Your wishlist is currently empty. Go to the search page to explore hostels.</p>
+                   <button onClick={() => navigate('/search')} className="btn btn-secondary mt-4">Explore Hostels</button>
+                </div>
+              )}
             </div>
           )}
 
