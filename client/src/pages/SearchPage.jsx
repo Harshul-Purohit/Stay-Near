@@ -12,37 +12,26 @@ const SearchPage = () => {
   const [hostels, setHostels] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Local filter states synced with URL
+  // Local text search input state (to prevent querying on every keystroke)
   const [search, setSearch] = useState(searchParams.get('search') || '');
-  const [genderType, setGenderType] = useState(searchParams.get('genderType') || 'all');
-  const [budget, setBudget] = useState(searchParams.get('budget') || '15000');
-  const [roomType, setRoomType] = useState(searchParams.get('roomType') || 'all');
-  const [selectedFacilities, setSelectedFacilities] = useState(
-    searchParams.get('facilities') ? searchParams.get('facilities').split(',') : []
-  );
-  const [minRating, setMinRating] = useState(searchParams.get('rating') || '0');
-  const [acType, setAcType] = useState(searchParams.get('acType') || 'all'); // 'all', 'ac', 'non-ac'
-  const [foodType, setFoodType] = useState(searchParams.get('foodType') || 'all'); // 'all', 'food'
-  const [sort, setSort] = useState(searchParams.get('sort') || 'newest');
+  
+  // Local state synced with URL for other filters
+  const genderType = searchParams.get('genderType') || 'all';
+  const budget = searchParams.get('budget') || '15000';
+  const roomType = searchParams.get('roomType') || 'all';
+  const selectedFacilities = searchParams.get('facilities') ? searchParams.get('facilities').split(',') : [];
+  const minRating = searchParams.get('rating') || '0';
+  const acType = searchParams.get('acType') || 'all';
+  const foodType = searchParams.get('foodType') || 'all';
+  const sort = searchParams.get('sort') || 'newest';
 
   const facilityOptions = [
     'Wi-Fi', 'AC', 'Gym', 'Laundry', 'Power Backup', 'RO Water', 'CCTV Security', '3 Meals Daily'
   ];
 
-  // Sync URL search params to local state on URL change
+  // Keep text search input in sync if URL param changes externally
   useEffect(() => {
     setSearch(searchParams.get('search') || '');
-    setGenderType(searchParams.get('genderType') || 'all');
-    setBudget(searchParams.get('budget') || '15000');
-    setRoomType(searchParams.get('roomType') || 'all');
-    
-    let urlFacilities = searchParams.get('facilities') ? searchParams.get('facilities').split(',') : [];
-    setSelectedFacilities(urlFacilities);
-    
-    setMinRating(searchParams.get('rating') || '0');
-    setAcType(searchParams.get('acType') || 'all');
-    setFoodType(searchParams.get('foodType') || 'all');
-    setSort(searchParams.get('sort') || 'newest');
   }, [searchParams]);
 
   const fetchHostels = useCallback(async () => {
@@ -101,40 +90,41 @@ const SearchPage = () => {
     fetchHostels();
   }, [fetchHostels]);
 
-  // Sync state to URL params
-  const applyFilters = () => {
-    const params = {};
-    if (search) params.search = search;
-    if (genderType !== 'all') params.genderType = genderType;
-    if (budget) params.budget = budget;
-    if (roomType !== 'all') params.roomType = roomType;
-    if (selectedFacilities.length > 0) params.facilities = selectedFacilities.join(',');
-    if (minRating !== '0') params.rating = minRating;
-    if (acType !== 'all') params.acType = acType;
-    if (foodType !== 'all') params.foodType = foodType;
-    if (sort) params.sort = sort;
-
-    setSearchParams(params);
+  // General helper to update URL parameters reactive
+  const updateQueryParam = (key, value) => {
+    const nextParams = Object.fromEntries(searchParams.entries());
+    if (value && value !== 'all' && value !== '0') {
+      nextParams[key] = value;
+    } else {
+      delete nextParams[key];
+    }
+    setSearchParams(nextParams);
   };
 
   const handleFacilityChange = (fac) => {
+    let nextFacilities;
     if (selectedFacilities.includes(fac)) {
-      setSelectedFacilities(selectedFacilities.filter((f) => f !== fac));
+      nextFacilities = selectedFacilities.filter((f) => f !== fac);
     } else {
-      setSelectedFacilities([...selectedFacilities, fac]);
+      nextFacilities = [...selectedFacilities, fac];
     }
+    
+    const nextParams = Object.fromEntries(searchParams.entries());
+    if (nextFacilities.length > 0) {
+      nextParams.facilities = nextFacilities.join(',');
+    } else {
+      delete nextParams.facilities;
+    }
+    setSearchParams(nextParams);
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    updateQueryParam('search', search);
   };
 
   const handleResetFilters = () => {
     setSearch('');
-    setGenderType('all');
-    setBudget('15000');
-    setRoomType('all');
-    setSelectedFacilities([]);
-    setMinRating('0');
-    setAcType('all');
-    setFoodType('all');
-    setSort('newest');
     setSearchParams({});
   };
 
@@ -153,7 +143,6 @@ const SearchPage = () => {
     setSearchParams(params);
   };
 
-  // Check if any filter is active
   const hasActiveFilters = 
     searchParams.get('search') || 
     (searchParams.get('genderType') && searchParams.get('genderType') !== 'all') || 
@@ -178,11 +167,7 @@ const SearchPage = () => {
             className="form-control"
             style={{ width: '180px', padding: '6px 12px' }}
             value={sort}
-            onChange={(e) => {
-              const nextParams = Object.fromEntries(searchParams.entries());
-              nextParams.sort = e.target.value;
-              setSearchParams(nextParams);
-            }}
+            onChange={(e) => updateQueryParam('sort', e.target.value)}
             options={[
               { label: 'Newest First', value: 'newest' },
               { label: 'Price: Low to High', value: 'priceAsc' },
@@ -256,16 +241,19 @@ const SearchPage = () => {
           </div>
 
           {/* Text Search inside filters */}
-          <div className="form-group">
-            <label className="form-label" htmlFor="filter-search">Search Name / Area</label>
-            <Input
-              id="filter-search"
-              type="text"
-              placeholder="e.g. Sitapura"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
+          <form onSubmit={handleSearchSubmit} className="form-group flex gap-xs items-end">
+            <div className="flex-1">
+              <label className="form-label" htmlFor="filter-search">Search Name / Area</label>
+              <Input
+                id="filter-search"
+                type="text"
+                placeholder="e.g. Sitapura"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+            <Button type="submit" variant="primary" style={{ padding: '10px 14px' }}>Go</Button>
+          </form>
 
           {/* Gender Filter */}
           <div className="form-group">
@@ -274,7 +262,7 @@ const SearchPage = () => {
               id="filter-gender"
               className="form-control"
               value={genderType}
-              onChange={(e) => setGenderType(e.target.value)}
+              onChange={(e) => updateQueryParam('genderType', e.target.value)}
               options={[
                 { label: 'Any Gender', value: 'all' },
                 { label: 'Boys Only', value: 'boys' },
@@ -291,7 +279,7 @@ const SearchPage = () => {
               id="filter-room-capacity"
               className="form-control"
               value={roomType}
-              onChange={(e) => setRoomType(e.target.value)}
+              onChange={(e) => updateQueryParam('roomType', e.target.value)}
               options={[
                 { label: 'Any sharing type', value: 'all' },
                 { label: 'Single Sharing', value: 'Single' },
@@ -308,7 +296,7 @@ const SearchPage = () => {
               id="filter-ac-type"
               className="form-control"
               value={acType}
-              onChange={(e) => setAcType(e.target.value)}
+              onChange={(e) => updateQueryParam('acType', e.target.value)}
               options={[
                 { label: 'AC & Non-AC Rooms', value: 'all' },
                 { label: 'AC Rooms Only', value: 'ac' },
@@ -324,7 +312,7 @@ const SearchPage = () => {
               id="filter-food-type"
               className="form-control"
               value={foodType}
-              onChange={(e) => setFoodType(e.target.value)}
+              onChange={(e) => updateQueryParam('foodType', e.target.value)}
               options={[
                 { label: 'Any (Food Optional)', value: 'all' },
                 { label: '3 Meals Included', value: 'food' }
@@ -339,7 +327,7 @@ const SearchPage = () => {
               id="filter-rating"
               className="form-control"
               value={minRating}
-              onChange={(e) => setMinRating(e.target.value)}
+              onChange={(e) => updateQueryParam('rating', e.target.value)}
               options={[
                 { label: 'Show All Ratings', value: '0' },
                 { label: '4.0★ & above', value: '4' },
@@ -364,7 +352,7 @@ const SearchPage = () => {
               className="form-range"
               style={{ width: '100%', accentColor: 'var(--primary-color)', marginTop: '8px' }}
               value={budget}
-              onChange={(e) => setBudget(e.target.value)}
+              onChange={(e) => updateQueryParam('budget', e.target.value)}
             />
           </div>
 
@@ -373,7 +361,6 @@ const SearchPage = () => {
             <span className="form-label">Amenities / Facilities</span>
             <div className="facilities-checkboxes flex flex-col gap-xs">
               {facilityOptions.map((fac) => {
-                // If AC or 3 Meals Daily is managed by select dropdown, skip rendering as standard checkbox to keep UI clean
                 if (fac === 'AC' || fac === '3 Meals Daily') return null;
                 return (
                   <label key={fac} className="flex items-center gap-sm text-sm" style={{ cursor: 'pointer' }}>
@@ -389,10 +376,6 @@ const SearchPage = () => {
               })}
             </div>
           </div>
-
-          <Button onClick={applyFilters} variant="primary" className="btn-lg">
-            Apply Filters
-          </Button>
         </aside>
 
         {/* Results Listings Grid */}
