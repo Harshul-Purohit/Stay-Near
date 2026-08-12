@@ -63,6 +63,12 @@ export const getHostels = async (req, res, next) => {
       ];
     }
 
+    // Filter by Minimum Rating
+    const { rating } = req.query;
+    if (rating) {
+      query.rating = { $gte: Number(rating) };
+    }
+
     let result = Hostel.find(query);
 
     // Sorting options
