@@ -5,6 +5,7 @@ import {
   createHostel,
   updateHostel,
   uploadHostelImages,
+  deleteHostel,
 } from '../controllers/hostelController.js';
 import { protect, authorize } from '../middleware/authMiddleware.js';
 import { upload } from '../middleware/uploadMiddleware.js';
@@ -17,7 +18,8 @@ router.route('/')
 
 router.route('/:id')
   .get(getHostelById)
-  .put(protect, authorize('owner', 'admin'), updateHostel);
+  .put(protect, authorize('owner', 'admin'), updateHostel)
+  .delete(protect, authorize('owner', 'admin'), deleteHostel);
 
 router.post(
   '/:id/images',

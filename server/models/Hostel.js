@@ -100,6 +100,14 @@ const hostelSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Please add owner contact number'],
     },
+    whatsappNumber: {
+      type: String,
+      default: '',
+    },
+    description: {
+      type: String,
+      default: '',
+    },
     rating: {
       type: Number,
       default: 0,

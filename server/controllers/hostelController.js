@@ -256,3 +256,30 @@ export const uploadHostelImages = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Delete hostel listing
+// @route   DELETE /api/hostels/:id
+// @access  Private (Owner/Admin only)
+export const deleteHostel = async (req, res, next) => {
+  try {
+    const hostel = await Hostel.findById(req.params.id);
+
+    if (!hostel) {
+      return res.status(404).json({ success: false, message: 'Hostel not found' });
+    }
+
+    // Check ownership
+    if (hostel.owner.toString() !== req.user.id && req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Not authorized to delete this hostel listing' });
+    }
+
+    await hostel.deleteOne();
+
+    res.status(200).json({
+      success: true,
+      message: 'Hostel deleted successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
