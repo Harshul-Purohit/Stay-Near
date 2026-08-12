@@ -158,3 +158,19 @@ export const getAnalytics = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Get all registered users (excluding admins)
+// @route   GET /api/admin/users
+// @access  Private (Admin only)
+export const getUsers = async (req, res, next) => {
+  try {
+    const users = await User.find({ role: { $ne: 'admin' } }).select('-password');
+    res.status(200).json({
+      success: true,
+      count: users.length,
+      users,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

@@ -7,6 +7,7 @@ import {
   suspendUser,
   getReportedReviews,
   getAnalytics,
+  getUsers,
 } from '../controllers/adminController.js';
 import { protect, authorize } from '../middleware/authMiddleware.js';
 
@@ -23,5 +24,6 @@ router.put('/approve-hostel/:id', approveHostel);
 router.put('/suspend-user/:id', suspendUser);
 router.get('/reported-reviews', getReportedReviews);
 router.get('/analytics', getAnalytics);
+router.get('/users', getUsers);
 
 export default router;
