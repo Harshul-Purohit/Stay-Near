@@ -25,6 +25,15 @@ const HostelDetailsPage = () => {
   const [newComment, setNewComment] = useState('');
   const [submitLoading, setSubmitLoading] = useState(false);
 
+  // Editing Review state
+  const [editingReviewId, setEditingReviewId] = useState('');
+  const [editingRating, setEditingRating] = useState(5);
+  const [editingComment, setEditingComment] = useState('');
+
+  // Reporting Review state
+  const [reportingReviewId, setReportingReviewId] = useState('');
+  const [reportReason, setReportReason] = useState('');
+
   // Wishlist state
   const isWishlisted = hostel ? isInWishlist(hostel._id) : false;
 
@@ -77,11 +86,84 @@ const HostelDetailsPage = () => {
         ]);
         setNewComment('');
         setNewRating(5);
+        // Refresh hostel details
+        const detailsRes = await api.get(`/hostels/${id}`);
+        if (detailsRes.data.success) {
+          setHostel(detailsRes.data.hostel);
+        }
       }
     } catch (err) {
       showToast(err.response?.data?.message || 'Failed to submit review.', 'error');
     } finally {
       setSubmitLoading(false);
+    }
+  };
+
+  const handleReviewUpdate = async (e, reviewId) => {
+    e.preventDefault();
+    if (!editingComment.trim()) {
+      showToast('Please enter a review comment.', 'warning');
+      return;
+    }
+
+    try {
+      const res = await api.put(`/reviews/${reviewId}`, {
+        rating: editingRating,
+        comment: editingComment,
+      });
+
+      if (res.data.success) {
+        showToast('Review updated successfully!', 'success');
+        setReviews(reviews.map((r) => r._id === reviewId ? {
+          ...r,
+          rating: editingRating,
+          comment: editingComment,
+        } : r));
+        setEditingReviewId('');
+        // Refresh hostel details
+        const detailsRes = await api.get(`/hostels/${id}`);
+        if (detailsRes.data.success) {
+          setHostel(detailsRes.data.hostel);
+        }
+      }
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Failed to update review.', 'error');
+    }
+  };
+
+  const handleReviewDelete = async (reviewId) => {
+    if (!window.confirm('Are you sure you want to delete your review?')) return;
+    try {
+      const res = await api.delete(`/reviews/${reviewId}`);
+      if (res.data.success) {
+        showToast('Review deleted successfully!', 'success');
+        setReviews(reviews.filter((r) => r._id !== reviewId));
+        // Refresh hostel details
+        const detailsRes = await api.get(`/hostels/${id}`);
+        if (detailsRes.data.success) {
+          setHostel(detailsRes.data.hostel);
+        }
+      }
+    } catch (err) {
+      showToast('Failed to delete review.', 'error');
+    }
+  };
+
+  const handleReviewReport = async (e, reviewId) => {
+    e.preventDefault();
+    if (!reportReason.trim()) {
+      showToast('Please enter a reason for reporting.', 'warning');
+      return;
+    }
+    try {
+      const res = await api.post(`/reviews/${reviewId}/report`, { reason: reportReason });
+      if (res.data.success) {
+        showToast('Review reported successfully.', 'success');
+        setReportingReviewId('');
+        setReportReason('');
+      }
+    } catch (err) {
+      showToast('Failed to report review.', 'error');
     }
   };
 
@@ -103,7 +185,6 @@ const HostelDetailsPage = () => {
     );
   }
 
-  // Safe images fallback
   const hostelImages = hostel.images && hostel.images.length > 0 
     ? hostel.images 
     : ['https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&q=80&w=1200'];
@@ -125,7 +206,7 @@ const HostelDetailsPage = () => {
             <span className={`badge badge-${hostel.genderType}`}>{hostel.genderType}</span>
             {hostel.isVerified && <span className="badge badge-verified">✓ Verified</span>}
           </div>
-          <p className="text-muted-color" style={{ marginTop: '5px' }}> {hostel.location?.address}</p>
+          <p className="text-muted-color" style={{ marginTop: '5px' }}>📍 {hostel.location?.address}</p>
         </div>
         
         <div className="flex items-center gap-md">
@@ -318,7 +399,7 @@ const HostelDetailsPage = () => {
         <h2 className="font-bold text-xl section-title">Student Reviews</h2>
         
         {/* Add Review Form */}
-        {user && user.role === 'student' && (
+        {user && user.role === 'student' && !reviews.some((r) => r.student?._id === user._id || r.student === user._id) && (
           <form onSubmit={handleReviewSubmit} className="card flex flex-col gap-md" style={{ margin: '20px 0' }}>
             <h3 className="font-semibold text-base">Write a Review</h3>
             <div className="form-group flex items-center gap-md">
@@ -346,25 +427,108 @@ const HostelDetailsPage = () => {
         {/* Reviews List */}
         <div className="reviews-list flex flex-col gap-md" style={{ marginTop: '20px' }}>
           {reviews.length > 0 ? (
-            reviews.map((rev) => (
-              <div key={rev._id} className="card flex flex-col gap-sm">
-                <div className="flex justify-between items-center flex-wrap gap-xs">
-                  <div>
-                    <span className="font-semibold text-sm">{rev.student?.name || 'Verified Student'}</span>
-                    <div className="text-xs text-muted-color">{new Date(rev.createdAt).toLocaleDateString()}</div>
+            reviews.map((rev) => {
+              const reviewOwnerId = rev.student?._id || rev.student;
+              const isOwnReview = user && user._id === reviewOwnerId;
+
+              return (
+                <div key={rev._id} className="card flex flex-col gap-sm">
+                  <div className="flex justify-between items-center flex-wrap gap-xs">
+                    <div>
+                      <span className="font-semibold text-sm">{rev.student?.name || 'Verified Student'}</span>
+                      <div className="text-xs text-muted-color">{new Date(rev.createdAt).toLocaleDateString()}</div>
+                    </div>
+                    <Rating rating={rev.rating} size="sm" />
                   </div>
-                  <Rating rating={rev.rating} size="sm" />
+
+                  {editingReviewId === rev._id ? (
+                    <form onSubmit={(e) => handleReviewUpdate(e, rev._id)} className="flex flex-col gap-sm mt-2">
+                      <div className="flex items-center gap-md">
+                        <span className="text-xs font-semibold">Your Rating:</span>
+                        <Rating rating={editingRating} interactive={true} onRatingChange={setEditingRating} size="sm" />
+                      </div>
+                      <textarea
+                        rows="3"
+                        className="form-control text-sm"
+                        value={editingComment}
+                        onChange={(e) => setEditingComment(e.target.value)}
+                        required
+                      ></textarea>
+                      <div className="flex gap-sm">
+                        <button type="submit" className="btn btn-primary btn-sm" style={{ fontSize: '11px', padding: '4px 10px' }}>Save</button>
+                        <button type="button" onClick={() => setEditingReviewId('')} className="btn btn-secondary btn-sm" style={{ fontSize: '11px', padding: '4px 10px' }}>Cancel</button>
+                      </div>
+                    </form>
+                  ) : (
+                    <>
+                      <p className="text-sm text-secondary-color" style={{ marginTop: '5px' }}>{rev.comment}</p>
+                      
+                      {reportingReviewId === rev._id ? (
+                        <form onSubmit={(e) => handleReviewReport(e, rev._id)} className="flex flex-col gap-xs mt-2 p-2 rounded bg-surface-container">
+                          <label className="text-xs font-semibold">Reason for Flagging:</label>
+                          <input 
+                            type="text" 
+                            className="form-control text-xs" 
+                            placeholder="e.g. Inappropriate language, spam..."
+                            value={reportReason}
+                            onChange={(e) => setReportReason(e.target.value)}
+                            required
+                          />
+                          <div className="flex gap-xs mt-2">
+                            <button type="submit" className="btn btn-primary btn-sm" style={{ fontSize: '10px', padding: '3px 8px' }}>Submit Flag</button>
+                            <button type="button" onClick={() => setReportingReviewId('')} className="btn btn-secondary btn-sm" style={{ fontSize: '10px', padding: '3px 8px' }}>Cancel</button>
+                          </div>
+                        </form>
+                      ) : (
+                        <div className="flex gap-sm mt-2">
+                          {isOwnReview && (
+                            <>
+                              <button 
+                                onClick={() => {
+                                  setEditingReviewId(rev._id);
+                                  setEditingRating(rev.rating);
+                                  setEditingComment(rev.comment);
+                                }}
+                                className="text-xs font-semibold"
+                                style={{ color: 'var(--primary-color)', cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}
+                              >
+                                Edit Review
+                              </button>
+                              <button 
+                                onClick={() => handleReviewDelete(rev._id)}
+                                className="text-xs font-semibold"
+                                style={{ color: 'var(--error-color)', cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}
+                              >
+                                Delete Review
+                              </button>
+                            </>
+                          )}
+                          {!isOwnReview && user && (
+                            <button 
+                              onClick={() => {
+                                setReportingReviewId(rev._id);
+                                setReportReason('');
+                              }}
+                              className="text-xs font-semibold text-muted-color"
+                              style={{ cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}
+                            >
+                              🏳 Report Review
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </>
+                  )}
+                  
+                  {rev.ownerReply && (
+                    <div className="owner-reply card" style={{ padding: '10px 15px', backgroundColor: 'var(--bg-color)', borderLeft: '3px solid var(--primary-color)', marginTop: '5px' }}>
+                      <span className="font-semibold text-xs" style={{ color: 'var(--primary-color)' }}>Owner Reply:</span>
+                      <p className="text-sm" style={{ marginTop: '2px' }}>{rev.ownerReply}</p>
+                    </div>
+                  )}
                 </div>
-                <p className="text-sm text-secondary-color" style={{ marginTop: '5px' }}>{rev.comment}</p>
-                
-                {rev.ownerReply && (
-                  <div className="owner-reply card" style={{ padding: '10px 15px', backgroundColor: 'var(--bg-color)', borderLeft: '3px solid var(--primary-color)', marginTop: '5px' }}>
-                    <span className="font-semibold text-xs" style={{ color: 'var(--primary-color)' }}>Owner Reply:</span>
-                    <p className="text-sm" style={{ marginTop: '2px' }}>{rev.ownerReply}</p>
-                  </div>
-                )}
-              </div>
-            ))
+              );
+            })
           ) : (
             <p className="text-muted-color text-center" style={{ padding: '30px 0' }}>No student reviews yet. Be the first to leave a review!</p>
           )}
