@@ -1,7 +1,7 @@
-﻿import React from 'react';
+import React, { memo } from 'react';
 
 const CompareCard = ({ hostel }) => {
   return <div className='compare-card card'>Compare: {hostel?.name}</div>;
 };
 
-export default CompareCard;
+export default memo(CompareCard);

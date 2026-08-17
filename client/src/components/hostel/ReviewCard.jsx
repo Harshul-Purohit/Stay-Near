@@ -1,7 +1,7 @@
-﻿import React from 'react';
+import React, { memo } from 'react';
 
 const ReviewCard = ({ review }) => {
   return <div className='review-card card'>{review?.text}</div>;
 };
 
-export default ReviewCard;
+export default memo(ReviewCard);

@@ -1,7 +1,7 @@
-﻿import React from 'react';
+import React, { memo } from 'react';
 
 const FacilityCard = ({ facility }) => {
   return <div className='facility-card'>{facility}</div>;
 };
 
-export default FacilityCard;
+export default memo(FacilityCard);

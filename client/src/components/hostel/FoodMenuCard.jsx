@@ -1,7 +1,7 @@
-﻿import React from 'react';
+import React, { memo } from 'react';
 
 const FoodMenuCard = ({ menu }) => {
   return <div className='food-menu-card'>{menu}</div>;
 };
 
-export default FoodMenuCard;
+export default memo(FoodMenuCard);

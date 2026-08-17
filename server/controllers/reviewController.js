@@ -147,3 +147,22 @@ export const reportReview = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Get current student's reviews
+// @route   GET /api/reviews/my-reviews
+// @access  Private (Student only)
+export const getMyReviews = async (req, res, next) => {
+  try {
+    const reviews = await Review.find({ student: req.user.id })
+      .populate('hostel', 'name')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      reviews,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+

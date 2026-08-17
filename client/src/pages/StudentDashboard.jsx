@@ -41,20 +41,13 @@ const StudentDashboard = () => {
 
     const fetchStudentData = async () => {
       try {
-        // Fetch reviews made by student
-        // Let's get all hostels, then filter reviews client-side or use a user-specific API
-        const res = await api.get('/hostels?all=true');
+        const res = await api.get('/reviews/my-reviews');
         if (res.data.success) {
-          const studentReviews = [];
-          for (const hostel of res.data.hostels) {
-            const detailRes = await api.get(`/hostels/${hostel._id}`);
-            if (detailRes.data.success) {
-              const matched = detailRes.data.reviews.filter((r) => r.student?._id === user._id || r.student === user._id);
-              matched.forEach((r) => {
-                studentReviews.push({ ...r, hostelName: hostel.name, hostelId: hostel._id });
-              });
-            }
-          }
+          const studentReviews = res.data.reviews.map((r) => ({
+            ...r,
+            hostelName: r.hostel?.name || 'Unknown Hostel',
+            hostelId: r.hostel?._id,
+          }));
           setReviews(studentReviews);
         }
       } catch (err) {

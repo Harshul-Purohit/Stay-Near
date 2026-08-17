@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Link } from 'react-router-dom';
 import Rating from '../ui/Rating';
 import { useCompare } from '../../context/CompareContext';
@@ -129,4 +129,4 @@ const HostelCard = ({ hostel }) => {
   );
 };
 
-export default HostelCard;
+export default memo(HostelCard);

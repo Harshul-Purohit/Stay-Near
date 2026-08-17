@@ -35,38 +35,38 @@ const AdminDashboard = () => {
   const fetchAdminData = useCallback(async () => {
     try {
       setError(null);
-      // Get Analytics
-      const analRes = await api.get('/admin/analytics');
+      
+      const [
+        analRes,
+        ownersRes,
+        hostelsRes,
+        reviewsRes,
+        allHostelsRes,
+        allUsersRes
+      ] = await Promise.all([
+        api.get('/admin/analytics'),
+        api.get('/admin/pending-owners'),
+        api.get('/admin/pending-hostels'),
+        api.get('/admin/reported-reviews'),
+        api.get('/hostels?all=true'),
+        api.get('/admin/users')
+      ]);
+
       if (analRes.data.success) {
         setAnalytics(analRes.data.stats);
       }
-
-      // Get Pending Owners
-      const ownersRes = await api.get('/admin/pending-owners');
       if (ownersRes.data.success) {
         setPendingOwners(ownersRes.data.owners);
       }
-
-      // Get Pending Hostels
-      const hostelsRes = await api.get('/admin/pending-hostels');
       if (hostelsRes.data.success) {
         setPendingHostels(hostelsRes.data.hostels);
       }
-
-      // Get Reported Reviews
-      const reviewsRes = await api.get('/admin/reported-reviews');
       if (reviewsRes.data.success) {
         setReportedReviews(reviewsRes.data.reviews);
       }
-
-      // Get All Hostels
-      const allHostelsRes = await api.get('/hostels?all=true');
       if (allHostelsRes.data.success) {
         setAllHostels(allHostelsRes.data.hostels);
       }
-
-      // Get All Users
-      const allUsersRes = await api.get('/admin/users');
       if (allUsersRes.data.success) {
         setAllUsers(allUsersRes.data.users);
       }
